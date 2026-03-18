@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Guerreira Pay</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Guerreira Pay" />
+  <meta name="theme-color" content="#0a1628" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#0a1628;color:#e2e8f0;min-height:100vh;-webkit-tap-highlight-color:transparent}
+    .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a1628,#0f1d32,#162544);padding:20px}
+    .auth-card{background:#1e293b;border-radius:20px;padding:40px 32px;width:400px;max-width:100%;box-shadow:0 25px 60px rgba(0,0,0,.4)}
+    .auth-logo{text-align:center;margin-bottom:28px}
+    .auth-title{font-size:24px;font-weight:800;color:#f8fafc;text-align:center;margin-bottom:4px}
+    .auth-subtitle{font-size:12px;color:#64748b;text-align:center;margin-bottom:28px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+    .auth-input{width:100%;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#e2e8f0;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px;-webkit-appearance:none}
+    .auth-input:focus{border-color:#2563eb}
+    .auth-input::placeholder{color:#475569}
+    .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
+    .auth-btn:disabled{opacity:.5}
+    .auth-link{display:block;text-align:center;margin-top:16px;color:#3b82f6;font-size:14px;cursor:pointer;font-weight:600;background:none;border:none;font-family:'DM Sans',sans-serif;padding:8px}
+    .auth-error{background:#ef444422;border:1px solid #ef444444;border-radius:8px;padding:10px 14px;color:#fca5a5;font-size:13px;margin-bottom:14px;text-align:center}
+    .auth-success{background:#22c55e22;border:1px solid #22c55e44;border-radius:8px;padding:10px 14px;color:#86efac;font-size:13px;margin-bottom:14px;text-align:center}
+    .auth-label{display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px}
+    .pw-field{position:relative}.pw-field .auth-input{padding-right:44px}
+    .pw-toggle{position:absolute;right:12px;top:12px;background:none;border:none;color:#64748b;cursor:pointer;font-size:18px;padding:4px}
+    .top-bar{background:#0a1628;border-bottom:1px solid #1e3a5f;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:50}
+    .user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+    .menu-btn{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 14px;color:#94a3b8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+    .dropdown{position:absolute;top:100%;right:0;margin-top:6px;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:8px;min-width:220px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none}
+    .dropdown.open{display:block}
+    .dd-item{display:block;width:100%;padding:10px 12px;background:none;border:none;color:#cbd5e1;font-size:13px;cursor:pointer;border-radius:6px;text-align:left;font-family:'DM Sans',sans-serif;font-weight:500}
+    .dd-item:hover{background:#334155}
+    .dd-item.danger{color:#f87171}
+    .dd-header{padding:10px 12px;border-bottom:1px solid #334155;margin-bottom:4px}
+    .role-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+    .role-badge.admin{background:#2563eb22;color:#3b82f6}
+    .role-badge.user{background:#22c55e22;color:#22c55e}
+    .spinner{width:32px;height:32px;border:3px solid #334155;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div id="auth-screen"></div>
+<div id="app-screen" style="display:none">
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="user-avatar" id="userAvatar"></div>
+      <div><div id="userName" style="font-size:12px;color:#94a3b8;font-weight:600"></div><div id="userRole" style="font-size:9px;color:#3b82f6;font-weight:700;text-transform:uppercase"></div></div>
+    </div>
+    <div style="position:relative">
+      <button class="menu-btn" id="menuBtn">Menu &#9662;</button>
+      <div class="dropdown" id="menuDropdown">
+        <div class="dd-header">
+          <div id="ddName" style="font-size:13px;font-weight:700;color:#f8fafc"></div>
+          <div id="ddEmail" style="font-size:11px;color:#64748b"></div>
+          <div style="margin-top:4px"><span class="role-badge" id="ddBadge"></span></div>
+        </div>
+        <div id="ddAdminItems"></div>
+        <button class="dd-item" id="btnChangePw">Alterar senha</button>
+        <button class="dd-item danger" id="btnLogout">Sair</button>
+      </div>
+    </div>
+  </div>
+  <iframe id="appFrame" style="width:100%;border:none"></iframe>
+</div>
+
+<script type="module">
+const SUPABASE_URL='https://sgckmmhtbtpjaszbwcyo.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnY2ttbWh0YnRwamFzemJ3Y3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MDg3NzIsImV4cCI6MjA4OTI4NDc3Mn0.P3Gn5yNhmCaVSyRdlT_XD9qBjY6JB7kpLTdOFT5lY5Q';
+const ADMIN_EMAILS=['rodolfo_alexandre@ymail.com'];
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+function logo(s=80){return`<svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8" stroke="#6b839a" stroke-width="0.5"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797" stroke="#1e3f6e" stroke-width="0.5"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5" stroke="#2b5797" stroke-width="0.5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" text-anchor="middle" fill="#2b5797" font-size="11" font-weight="900" font-family="Arial" letter-spacing="1">GUERREIRA</text><text x="50" y="94" text-anchor="middle" fill="#8fa4b8" font-size="7" font-weight="600" font-family="Arial" letter-spacing="2">PAY</text></svg>`}
+
+const authScreen=document.getElementById('auth-screen');
+const appScreen=document.getElementById('app-screen');
+const appFrame=document.getElementById('appFrame');
+
+function isAdmin(u){
+  if(!u)return false;
+  if(ADMIN_EMAILS.includes(u.email?.toLowerCase()))return true;
+  return u.user_metadata?.role==='admin';
+}
+
+function resizeFrame(){
+  const bar=document.querySelector('.top-bar');
+  if(bar&&appFrame){appFrame.style.height=(window.innerHeight-bar.offsetHeight)+'px';}
+}
+
+// ─── Show Login ───
+function showLogin(error,success){
+  appScreen.style.display='none';
+  authScreen.style.display='block';
+  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
+    <div class="auth-logo">${logo(80)}</div>
+    <div class="auth-title">Guerreira Pay</div>
+    <div class="auth-subtitle">Gestao de Pagamentos</div>
+    ${error?`<div class="auth-error">${error}</div>`:''}
+    ${success?`<div class="auth-success">${success}</div>`:''}
+    <form id="loginForm">
+      <label class="auth-label">E-mail</label>
+      <input class="auth-input" type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email"/>
+      <label class="auth-label">Senha</label>
+      <div class="pw-field"><input class="auth-input" type="password" id="loginPass" placeholder="Sua senha" required autocomplete="current-password"/></div>
+      <button class="auth-btn" type="submit">Entrar</button>
+    </form>
+    <button class="auth-link" id="forgotLink">Esqueci minha senha</button>
+  </div></div>`;
+  document.getElementById('loginForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const email=document.getElementById('loginEmail').value;
+    const pass=document.getElementById('loginPass').value;
+    if(!email||!pass){showLogin('Preencha e-mail e senha.');return;}
+    document.querySelector('.auth-btn').disabled=true;
+    document.querySelector('.auth-btn').textContent='Entrando...';
+    try{
+      const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
+      if(error)throw error;
+      showApp(data.user);
+    }catch(err){showLogin(translateError(err.message));}
+  });
+  document.getElementById('forgotLink').addEventListener('click',()=>showForgot());
+}
+
+// ─── Show Forgot ───
+function showForgot(){
+  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
+    <div class="auth-logo">${logo(64)}</div>
+    <div class="auth-title">Recuperar Senha</div>
+    <div class="auth-subtitle">Guerreira Pay</div>
+    <p style="color:#94a3b8;font-size:13px;margin-bottom:20px;text-align:center">Informe seu e-mail para receber o link.</p>
+    <form id="forgotForm">
+      <label class="auth-label">E-mail</label>
+      <input class="auth-input" type="email" id="forgotEmail" placeholder="seu@email.com" required/>
+      <button class="auth-btn" type="submit">Enviar link</button>
+    </form>
+    <button class="auth-link" id="backLogin">Voltar ao login</button>
+  </div></div>`;
+  document.getElementById('forgotForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const email=document.getElementById('forgotEmail').value;
+    try{await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin});showLogin(null,'Link enviado! Verifique seu e-mail.');}
+    catch(err){showLogin(translateError(err.message));}
+  });
+  document.getElementById('backLogin').addEventListener('click',()=>showLogin());
+}
+
+// ─── Show Register (admin only) ───
+function showRegister(){
+  authScreen.style.display='block';
+  appScreen.style.display='none';
+  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
+    <div class="auth-logo">${logo(64)}</div>
+    <div class="auth-title">Novo Usuario</div>
+    <div class="auth-subtitle">Guerreira Pay</div>
+    <div id="regMsg"></div>
+    <form id="regForm">
+      <label class="auth-label">Nome completo</label>
+      <input class="auth-input" type="text" id="regName" placeholder="Nome" required/>
+      <label class="auth-label">E-mail</label>
+      <input class="auth-input" type="email" id="regEmail" placeholder="email@exemplo.com" required/>
+      <label class="auth-label">Senha</label>
+      <input class="auth-input" type="password" id="regPass" placeholder="Minimo 6 caracteres" required minlength="6"/>
+      <label class="auth-label">Confirmar senha</label>
+      <input class="auth-input" type="password" id="regPassC" placeholder="Repita a senha" required minlength="6"/>
+      <label class="auth-label">Tipo de acesso</label>
+      <select class="auth-input" id="regRole"><option value="user">Administrativo</option><option value="admin">Administrador</option></select>
+      <button class="auth-btn" type="submit">Criar usuario</button>
+    </form>
+    <button class="auth-link" id="backApp">Voltar ao app</button>
+  </div></div>`;
+  document.getElementById('regForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const nm=document.getElementById('regName').value;
+    const em=document.getElementById('regEmail').value;
+    const pw=document.getElementById('regPass').value;
+    const pc=document.getElementById('regPassC').value;
+    const rl=document.getElementById('regRole').value;
+    const msg=document.getElementById('regMsg');
+    if(pw!==pc){msg.innerHTML='<div class="auth-error">As senhas nao conferem.</div>';return;}
+    document.querySelector('.auth-btn').disabled=true;
+    try{
+      const{error}=await supabase.auth.signUp({email:em,password:pw,options:{data:{name:nm,role:rl}}});
+      if(error)throw error;
+      // Also save to app_users table
+      await supabase.from('app_users').upsert({id:em,email:em,name:nm,role:rl});
+      msg.innerHTML=`<div class="auth-success">Usuario "${nm}" criado com sucesso!</div>`;
+      document.querySelector('.auth-btn').disabled=false;
+    }catch(err){msg.innerHTML=`<div class="auth-error">${translateError(err.message)}</div>`;document.querySelector('.auth-btn').disabled=false;}
+  });
+  document.getElementById('backApp').addEventListener('click',async()=>{
+    const{data:{session}}=await supabase.auth.getSession();
+    if(session?.user)showApp(session.user);else showLogin();
+  });
+}
+
+// ─── Show App ───
+function showApp(user){
+  authScreen.style.display='none';
+  appScreen.style.display='block';
+  const nm=user.user_metadata?.name||user.email?.split('@')[0]||'Usuario';
+  const em=user.email||'';
+  const adm=isAdmin(user);
+  const rc=adm?'admin':'user';
+  document.getElementById('userAvatar').textContent=nm.charAt(0).toUpperCase();
+  document.getElementById('userName').textContent=nm;
+  document.getElementById('userRole').textContent=adm?'Administrador':'Administrativo';
+  document.getElementById('ddName').textContent=nm;
+  document.getElementById('ddEmail').textContent=em;
+  const badge=document.getElementById('ddBadge');
+  badge.textContent=adm?'Admin':'Administrativo';
+  badge.className='role-badge '+(adm?'admin':'user');
+  document.getElementById('ddAdminItems').innerHTML=adm?'<button class="dd-item" id="btnNewUser">Criar novo usuario</button>':'';
+  // Load app
+  appFrame.src='app.html#role='+rc;
+  resizeFrame();
+  // Events
+  if(adm){setTimeout(()=>{const btn=document.getElementById('btnNewUser');if(btn)btn.addEventListener('click',()=>showRegister());},100);}
+}
+
+// ─── Menu Toggle ───
+document.getElementById('menuBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('menuDropdown').classList.toggle('open');
+});
+document.addEventListener('click',()=>{document.getElementById('menuDropdown').classList.remove('open');});
+
+// ─── Logout ───
+document.getElementById('btnLogout').addEventListener('click',async()=>{
+  await supabase.auth.signOut();showLogin();
+});
+
+// ─── Change Password ───
+document.getElementById('btnChangePw').addEventListener('click',async()=>{
+  const p=prompt('Nova senha (minimo 6 caracteres):');
+  if(!p||p.length<6){alert('Senha minimo 6 caracteres.');return;}
+  try{const{error}=await supabase.auth.updateUser({password:p});if(error)throw error;alert('Senha alterada!');}
+  catch(e){alert('Erro: '+translateError(e.message));}
+});
+
+window.addEventListener('resize',resizeFrame);
+
+function translateError(m){
+  const t={'Invalid login credentials':'E-mail ou senha incorretos.','Email not confirmed':'E-mail nao confirmado.','User already registered':'E-mail ja cadastrado.','Password should be at least 6 characters':'Senha minimo 6 caracteres.','Unable to validate email address: invalid format':'E-mail invalido.','Email rate limit exceeded':'Muitas tentativas. Aguarde.'};
+  for(const[k,v] of Object.entries(t))if(m.includes(k))return v;return m;
+}
+
+// ─── Init ───
+async function init(){
+  authScreen.innerHTML=`<div class="auth-container"><div style="text-align:center"><div class="auth-logo">${logo(80)}</div><div class="spinner"></div><p style="color:#94a3b8;font-size:14px">Carregando...</p></div></div>`;
+  try{
+    const{data:{session}}=await supabase.auth.getSession();
+    if(session?.user){showApp(session.user);}
+    else{showLogin();}
+  }catch(e){showLogin();}
+}
+init();
+</script>
+</body>
+</html>

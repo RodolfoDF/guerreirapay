@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+  <title>Guerreira Pay</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:#0f172a}#root{min-height:100vh}</style>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useEffect,useCallback,useMemo}=React;
+const SUPABASE_URL='https://sgckmmhtbtpjaszbwcyo.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnY2ttbWh0YnRwamFzemJ3Y3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MDg3NzIsImV4cCI6MjA4OTI4NDc3Mn0.P3Gn5yNhmCaVSyRdlT_XD9qBjY6JB7kpLTdOFT5lY5Q';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+// Role from hash
+const USER_ROLE=(window.location.hash.match(/role=(\w+)/)?.[1])||'admin';
+const IS_ADMIN=USER_ROLE==='admin';
+
+const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmt=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v||0);
+const fmtDate=d=>{if(!d)return"-";const[y,m,day]=d.split("-");return`${day}/${m}/${y}`;};
+const cpfMask=v=>v.replace(/\D/g,"").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2").slice(0,14);
+const today=()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;};
+
+function useSupabase(table,fieldMap){
+  const[data,setData]=useState([]);const[loaded,setLoaded]=useState(false);
+  const load=useCallback(async()=>{const{data:rows,error}=await sb.from(table).select('*').order('created_at',{ascending:true});if(!error&&rows){setData(rows.map(r=>{const o={};Object.entries(fieldMap).forEach(([j,d])=>{o[j]=r[d]});o._raw=r;return o}));}setLoaded(true);},[table]);
+  useEffect(()=>{load();},[load]);
+  const insert=useCallback(async item=>{const row={};Object.entries(fieldMap).forEach(([j,d])=>{if(item[j]!==undefined)row[d]=item[j]});const{data:ins,error}=await sb.from(table).insert(row).select().single();if(!error&&ins){const o={};Object.entries(fieldMap).forEach(([j,d])=>{o[j]=ins[d]});o._raw=ins;setData(p=>[...p,o]);return o}return null},[table,fieldMap]);
+  const update=useCallback(async(id,item)=>{const row={};Object.entries(fieldMap).forEach(([j,d])=>{if(item[j]!==undefined)row[d]=item[j]});const{error}=await sb.from(table).update(row).eq('id',id);if(!error)setData(p=>p.map(d=>d.id===id?{...d,...item}:d))},[table,fieldMap]);
+  const remove=useCallback(async id=>{const{error}=await sb.from(table).delete().eq('id',id);if(!error)setData(p=>p.filter(d=>d.id!==id))},[table]);
+  return{data,loaded,save:setData,insert,update,remove,reload:load};
+}
+
+const contractorFields={id:'id',name:'name',cpf:'cpf',bank:'bank',bankAgency:'bank_agency',bankAccount:'bank_account',pixKey:'pix_key'};
+const projectFields={id:'id',name:'name',address:'address',status:'status'};
+const contractFields={id:'id',contractorId:'contractor_id',projectId:'project_id',type:'type',totalValue:'total_value',description:'description',createdAt:'created_at'};
+const paymentFields={id:'id',contractId:'contract_id',amount:'amount',date:'date',note:'note'};
+
+function GuerreiraLogo({size=36}){return(<svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8" stroke="#6b839a" strokeWidth="0.5"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797" stroke="#1e3f6e" strokeWidth="0.5"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5" stroke="#2b5797" strokeWidth="0.5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" textAnchor="middle" fill="#2b5797" fontSize="11" fontWeight="900" fontFamily="Arial" letterSpacing="1">GUERREIRA</text><text x="50" y="94" textAnchor="middle" fill="#8fa4b8" fontSize="7" fontWeight="600" fontFamily="Arial" letterSpacing="2">PAY</text></svg>);}
+
+// Tabs based on role
+const ALL_TABS=[
+  {id:"dashboard",label:"Painel",icon:"\u{1F4CA}",admin:true},
+  {id:"contractors",label:"Empreiteiros",icon:"\u{1F477}",admin:false},
+  {id:"projects",label:"Obras",icon:"\u{1F3D7}\uFE0F",admin:false},
+  {id:"contracts",label:"Contratos",icon:"\u{1F4CB}",admin:false},
+  {id:"payments",label:"Pagamentos",icon:"\u{1F4B0}",admin:false},
+  {id:"paylist",label:"Lista Pgto",icon:"\u{1F4C4}",admin:false},
+  {id:"users",label:"Usuarios",icon:"\u{1F465}",admin:true},
+];
+const TABS=ALL_TABS.filter(t=>IS_ADMIN||!t.admin);
+
+function Modal({open,onClose,title,children}){if(!open)return null;return(<div onClick={onClose} style={{position:"fixed",inset:0,zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(15,23,42,.55)",backdropFilter:"blur(4px)"}}><div onClick={e=>e.stopPropagation()} style={{background:"#1e293b",borderRadius:16,padding:"28px 32px",width:480,maxWidth:"94vw",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 25px 60px rgba(0,0,0,.4)",color:"#e2e8f0"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}><h2 style={{margin:0,fontSize:20,fontWeight:700,color:"#f8fafc"}}>{title}</h2><button onClick={onClose} style={{background:"none",border:"none",color:"#94a3b8",fontSize:22,cursor:"pointer"}}>{"\u2715"}</button></div>{children}</div></div>);}
+function ConfirmDialog({open,message,onConfirm,onCancel}){if(!open)return null;return(<div onClick={onCancel} style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(15,23,42,.65)",backdropFilter:"blur(4px)"}}><div onClick={e=>e.stopPropagation()} style={{background:"#1e293b",borderRadius:14,padding:"24px 28px",width:360,maxWidth:"90vw",boxShadow:"0 25px 60px rgba(0,0,0,.5)",color:"#e2e8f0",textAlign:"center"}}><div style={{fontSize:36,marginBottom:12}}>{"\u26A0\uFE0F"}</div><p style={{fontSize:15,fontWeight:600,color:"#f8fafc",margin:"0 0 20px"}}>{message}</p><div style={{display:"flex",gap:12,justifyContent:"center"}}><button onClick={onCancel} style={btnSecondary}>Cancelar</button><button onClick={onConfirm} style={{padding:"10px 28px",background:"linear-gradient(135deg,#ef4444,#dc2626)",border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Remover</button></div></div></div>);}
+function useConfirm(){const[s,setS]=useState({open:false,message:"",resolve:null});const c=useCallback(m=>new Promise(r=>setS({open:true,message:m,resolve:r})),[]);const ok=useCallback(()=>{s.resolve?.(true);setS({open:false,message:"",resolve:null})},[s.resolve]);const no=useCallback(()=>{s.resolve?.(false);setS({open:false,message:"",resolve:null})},[s.resolve]);return[c,<ConfirmDialog open={s.open} message={s.message} onConfirm={ok} onCancel={no}/>];}
+
+const inputStyle={width:"100%",padding:"10px 14px",background:"#0f172a",border:"1px solid #334155",borderRadius:8,color:"#e2e8f0",fontSize:14,fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"};
+const labelStyle={display:"block",fontSize:12,fontWeight:600,color:"#94a3b8",marginBottom:6};
+const btnPrimary={padding:"10px 24px",background:"linear-gradient(135deg,#2563eb,#1d4ed8)",border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"};
+const btnSecondary={padding:"10px 24px",background:"transparent",border:"1px solid #475569",borderRadius:8,color:"#cbd5e1",fontWeight:600,fontSize:14,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"};
+function Field({label,children}){return<div style={{marginBottom:16}}><label style={labelStyle}>{label}</label>{children}</div>;}
+function StatusBadge({type}){const c={ativo:"#22c55e",concluido:"#3b82f6",cancelado:"#ef4444",aberto:"#f59e0b",fechado:"#8b5cf6"};const l={ativo:"Ativo",concluido:"Concluido",cancelado:"Cancelado",aberto:"Aberto",fechado:"Fechado"};return<span style={{display:"inline-block",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:(c[type]||"#64748b")+"22",color:c[type]||"#64748b"}}>{l[type]||type}</span>;}
+function EmptyState({icon,text}){return<div style={{textAlign:"center",padding:"48px 20px",color:"#475569"}}><div style={{fontSize:48,marginBottom:12}}>{icon}</div><p style={{fontSize:15,margin:0}}>{text}</p></div>;}
+function Card({children,style:s}){return<div style={{background:"#1e293b",borderRadius:14,padding:24,boxShadow:"0 1px 3px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.04)",...s}}>{children}</div>;}
+function StatCard({icon,label,value,sub}){return<Card><div style={{display:"flex",alignItems:"center",gap:14}}><div style={{width:48,height:48,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#2563eb22,#1d4ed822)",fontSize:22}}>{icon}</div><div><div style={{fontSize:12,color:"#94a3b8",fontWeight:600,marginBottom:4}}>{label}</div><div style={{fontSize:22,fontWeight:800,color:"#f8fafc"}}>{value}</div>{sub&&<div style={{fontSize:12,color:"#64748b",marginTop:2}}>{sub}</div>}</div></div></Card>;}
+
+function PaymentCalendar({selectedDate,onSelect,payments}){
+  const[vd,setVd]=useState(()=>{const d=new Date(selectedDate+"T12:00:00");return{y:d.getFullYear(),m:d.getMonth()};});
+  const pDates=useMemo(()=>{const s=new Set();payments.forEach(p=>s.add(p.date));return s;},[payments]);
+  const dim=new Date(vd.y,vd.m+1,0).getDate(),fdw=new Date(vd.y,vd.m,1).getDay();
+  const mn=new Date(vd.y,vd.m).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const prev=()=>setVd(v=>{const d=new Date(v.y,v.m-1,1);return{y:d.getFullYear(),m:d.getMonth()};});
+  const next=()=>setVd(v=>{const d=new Date(v.y,v.m+1,1);return{y:d.getFullYear(),m:d.getMonth()};});
+  const goTd=()=>{const n=new Date();setVd({y:n.getFullYear(),m:n.getMonth()});onSelect(today());};
+  const cells=[];for(let i=0;i<fdw;i++)cells.push(null);for(let d=1;d<=dim;d++)cells.push(d);const ts=today();
+  return(<div style={{background:"#1e293b",borderRadius:14,padding:16}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}><button onClick={prev} style={{background:"none",border:"none",color:"#94a3b8",fontSize:18,cursor:"pointer",padding:"4px 8px"}}>{"\u2039"}</button><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:14,fontWeight:700,color:"#f8fafc",textTransform:"capitalize"}}>{mn}</span><button onClick={goTd} style={{background:"#2563eb22",border:"1px solid #2563eb44",borderRadius:6,color:"#3b82f6",fontSize:10,fontWeight:700,padding:"3px 8px",cursor:"pointer"}}>HOJE</button></div><button onClick={next} style={{background:"none",border:"none",color:"#94a3b8",fontSize:18,cursor:"pointer",padding:"4px 8px"}}>{"\u203A"}</button></div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}}>{["Dom","Seg","Ter","Qua","Qui","Sex","Sab"].map(d=><div key={d} style={{textAlign:"center",fontSize:10,fontWeight:700,color:"#64748b",padding:"4px 0"}}>{d}</div>)}</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}}>{cells.map((day,i)=>{if(!day)return<div key={`e${i}`}/>;const ds=`${vd.y}-${String(vd.m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;const sel=ds===selectedDate,td=ds===ts,hp=pDates.has(ds);return(<button key={day} onClick={()=>onSelect(ds)} style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"6px 2px",minHeight:40,borderRadius:8,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",background:sel?"linear-gradient(135deg,#2563eb,#1d4ed8)":hp?"#22c55e18":"transparent",border:td&&!sel?"1px solid #3b82f666":sel?"none":hp?"1px solid #22c55e30":"1px solid transparent"}}><span style={{fontSize:13,fontWeight:sel||hp?700:400,color:sel?"#fff":td?"#3b82f6":hp?"#4ade80":"#cbd5e1"}}>{day}</span>{hp&&<div style={{width:5,height:5,borderRadius:"50%",background:sel?"#0f172a":"#22c55e",marginTop:2}}/>}</button>);})}</div>
+    <div style={{display:"flex",gap:16,marginTop:12,justifyContent:"center"}}><div style={{display:"flex",alignItems:"center",gap:5}}><div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/><span style={{fontSize:10,color:"#64748b"}}>Com pagamentos</span></div><div style={{display:"flex",alignItems:"center",gap:5}}><div style={{width:8,height:8,borderRadius:"50%",background:"#3b82f6"}}/><span style={{fontSize:10,color:"#64748b"}}>Selecionado</span></div></div>
+  </div>);
+}
+
+// ─── DASHBOARD (admin only) ───
+function Dashboard({contractors,projects,contracts,payments}){
+  const active=projects.filter(p=>p.status==="ativo").length;
+  const activeContracts=contracts.length;
+  const getPaid=cid=>payments.filter(p=>p.contractId===cid).reduce((s,p)=>s+(Number(p.amount)||0),0);
+  const totalAllPaid=payments.reduce((s,p)=>s+(Number(p.amount)||0),0);
+  return(<div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:16,marginBottom:28}}>
+      <StatCard icon={"\u{1F3D7}\uFE0F"} label="Obras Ativas" value={active} sub={`de ${projects.length} total`}/>
+      <StatCard icon={"\u{1F4CB}"} label="Contratos Ativos" value={activeContracts}/>
+    </div>
+    <h3 style={{fontSize:16,fontWeight:700,color:"#f8fafc",marginBottom:16}}>Resumo dos Contratos</h3>
+    {contracts.length===0?<Card><p style={{color:"#64748b",fontSize:14}}>Nenhum contrato cadastrado.</p></Card>:
+    <div style={{display:"grid",gap:12}}>
+      {contracts.map(c=>{
+        const con=contractors.find(x=>x.id===c.contractorId);
+        const proj=projects.find(x=>x.id===c.projectId);
+        const paid=getPaid(c.id);
+        const pct=c.totalValue>0?Math.min(100,(paid/c.totalValue)*100):0;
+        return(<Card key={c.id} style={{padding:"16px 20px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+            <div><div style={{fontWeight:700,fontSize:15,color:"#f8fafc"}}>{con?.name||"-"}</div><div style={{fontSize:12,color:"#94a3b8",marginTop:3}}>{proj?.name||"-"}{c.description&&<> &middot; {c.description}</>}</div></div>
+            <StatusBadge type={c.type}/>
+          </div>
+          <div style={{marginTop:12,display:"flex",alignItems:"center",gap:14}}>
+            <div style={{padding:"8px 14px",borderRadius:8,background:"linear-gradient(135deg,#22c55e18,#16a34a10)",border:"1px solid #22c55e30"}}>
+              <div style={{fontSize:9,color:"#86efac",fontWeight:700,textTransform:"uppercase",letterSpacing:.5,marginBottom:2}}>Total Pago</div>
+              <div style={{fontSize:16,fontWeight:800,color:"#22c55e"}}>{fmt(paid)}</div>
+            </div>
+            {c.type==="fechado"&&c.totalValue>0&&<div style={{flex:1}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:11,color:"#64748b"}}>de {fmt(c.totalValue)}</span><span style={{fontSize:11,color:"#64748b"}}>{pct.toFixed(0)}%</span></div>
+              <div style={{height:5,background:"#334155",borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",width:`${pct}%`,background:"linear-gradient(90deg,#2563eb,#22c55e)",borderRadius:3}}/></div>
+            </div>}
+          </div>
+        </Card>);
+      })}
+      <Card style={{background:"linear-gradient(135deg,#3b82f610,#1d4ed808)",border:"1px solid #3b82f633",padding:"14px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:14,fontWeight:700,color:"#3b82f6"}}>TOTAL GERAL PAGO</span>
+        <span style={{fontSize:20,fontWeight:800,color:"#3b82f6"}}>{fmt(totalAllPaid)}</span>
+      </Card>
+    </div>}
+  </div>);
+}
+
+// ─── CONTRACTORS ───
+function Contractors({contractors,cApi}){
+  const[modal,setModal]=useState(false),[edit,setEdit]=useState(null),[form,setForm]=useState({name:"",cpf:"",bank:"",bankAgency:"",bankAccount:"",pixKey:""}),[search,setSearch]=useState(""),[cf,cd]=useConfirm();
+  const openNew=()=>{setForm({name:"",cpf:"",bank:"",bankAgency:"",bankAccount:"",pixKey:""});setEdit(null);setModal(true);};
+  const openEdit=c=>{setForm({name:c.name,cpf:c.cpf||"",bank:c.bank||"",bankAgency:c.bankAgency||"",bankAccount:c.bankAccount||"",pixKey:c.pixKey||""});setEdit(c.id);setModal(true);};
+  const save=async()=>{if(!form.name||!form.cpf)return;if(edit){await cApi.update(edit,form);}else{await cApi.insert({...form,id:genId()});}setModal(false);};
+  const rm=async id=>{if(await cf("Remover este empreiteiro?"))await cApi.remove(id);};
+  const filtered=contractors.filter(c=>c.name?.toLowerCase().includes(search.toLowerCase())||c.cpf?.includes(search));
+  return(<div>
+    <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}><input placeholder="Buscar por nome ou CPF..." value={search} onChange={e=>setSearch(e.target.value)} style={{...inputStyle,flex:1,minWidth:200}}/><button onClick={openNew} style={btnPrimary}>+ Novo Empreiteiro</button></div>
+    {filtered.length===0?<EmptyState icon={"\u{1F477}"} text="Nenhum empreiteiro cadastrado."/>:
+    <div style={{display:"grid",gap:12}}>{filtered.map(c=>(<Card key={c.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12,padding:"18px 24px"}}>
+      <div><div style={{fontWeight:700,fontSize:16,color:"#f8fafc"}}>{c.name}</div><div style={{fontSize:13,color:"#94a3b8",marginTop:4}}>CPF: {c.cpf} {c.bank&&<>&nbsp;| Banco: {c.bank}</>} &nbsp;| Ag: {c.bankAgency} &nbsp;| Conta: {c.bankAccount}</div>{c.pixKey&&<div style={{fontSize:12,color:"#64748b",marginTop:2}}>Pix: {c.pixKey}</div>}</div>
+      <div style={{display:"flex",gap:8}}><button onClick={()=>openEdit(c)} style={{...btnSecondary,padding:"6px 14px",fontSize:12}}>Editar</button><button onClick={()=>rm(c.id)} style={{...btnSecondary,padding:"6px 14px",fontSize:12,borderColor:"#ef4444",color:"#ef4444"}}>Remover</button></div>
+    </Card>))}</div>}
+    <Modal open={modal} onClose={()=>setModal(false)} title={edit?"Editar Empreiteiro":"Novo Empreiteiro"}>
+      <Field label="Nome Completo"><input style={inputStyle} value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
+      <Field label="CPF"><input style={inputStyle} value={form.cpf} maxLength={14} onChange={e=>setForm({...form,cpf:cpfMask(e.target.value)})} placeholder="000.000.000-00"/></Field>
+      <Field label="Banco"><input style={inputStyle} value={form.bank} onChange={e=>setForm({...form,bank:e.target.value})} placeholder="Ex: Bradesco, Itau, Caixa..."/></Field>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Agencia"><input style={inputStyle} value={form.bankAgency} onChange={e=>setForm({...form,bankAgency:e.target.value})}/></Field><Field label="Conta"><input style={inputStyle} value={form.bankAccount} onChange={e=>setForm({...form,bankAccount:e.target.value})}/></Field></div>
+      <Field label="Chave Pix"><input style={inputStyle} value={form.pixKey} onChange={e=>setForm({...form,pixKey:e.target.value})}/></Field>
+      <div style={{display:"flex",gap:12,justifyContent:"flex-end",marginTop:20}}><button onClick={()=>setModal(false)} style={btnSecondary}>Cancelar</button><button onClick={save} style={btnPrimary}>{edit?"Salvar":"Cadastrar"}</button></div>
+    </Modal>{cd}</div>);
+}
+
+// ─── PROJECTS (admin only) ───
+function Projects({projects,pApi}){
+  const[modal,setModal]=useState(false),[edit,setEdit]=useState(null),[form,setForm]=useState({name:"",address:"",status:"ativo"}),[cf,cd]=useConfirm();
+  const openNew=()=>{setForm({name:"",address:"",status:"ativo"});setEdit(null);setModal(true);};
+  const openEdit=p=>{setForm({name:p.name,address:p.address||"",status:p.status||"ativo"});setEdit(p.id);setModal(true);};
+  const rm=async id=>{if(await cf("Remover esta obra?"))await pApi.remove(id);};
+  const save=async()=>{if(!form.name)return;if(edit){await pApi.update(edit,form);}else{await pApi.insert({...form,id:genId()});}setModal(false);};
+  return(<div>
+    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:20}}><button onClick={openNew} style={btnPrimary}>+ Nova Obra</button></div>
+    {projects.length===0?<EmptyState icon={"\u{1F3D7}\uFE0F"} text="Nenhuma obra cadastrada."/>:
+    <div style={{display:"grid",gap:12}}>{projects.map(p=>(<Card key={p.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12,padding:"18px 24px"}}>
+      <div><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontWeight:700,fontSize:16,color:"#f8fafc"}}>{p.name}</span><StatusBadge type={p.status}/></div>{p.address&&<div style={{fontSize:13,color:"#94a3b8",marginTop:4}}>{p.address}</div>}</div>
+      <div style={{display:"flex",gap:8}}><button onClick={()=>openEdit(p)} style={{...btnSecondary,padding:"6px 14px",fontSize:12}}>Editar</button><button onClick={()=>rm(p.id)} style={{...btnSecondary,padding:"6px 14px",fontSize:12,borderColor:"#ef4444",color:"#ef4444"}}>Remover</button></div>
+    </Card>))}</div>}
+    <Modal open={modal} onClose={()=>setModal(false)} title={edit?"Editar Obra":"Nova Obra"}>
+      <Field label="Nome da Obra"><input style={inputStyle} value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></Field>
+      <Field label="Endereco"><input style={inputStyle} value={form.address} onChange={e=>setForm({...form,address:e.target.value})}/></Field>
+      <Field label="Status"><select style={inputStyle} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}><option value="ativo">Ativo</option><option value="concluido">Concluido</option><option value="cancelado">Cancelado</option></select></Field>
+      <div style={{display:"flex",gap:12,justifyContent:"flex-end",marginTop:20}}><button onClick={()=>setModal(false)} style={btnSecondary}>Cancelar</button><button onClick={save} style={btnPrimary}>{edit?"Salvar":"Criar Obra"}</button></div>
+    </Modal>{cd}</div>);
+}
+
+// ─── CONTRACTS (read-only for non-admin) ───
+function Contracts({contractors,projects,contracts,ctApi,payments}){
+  const[modal,setModal]=useState(false),[edit,setEdit]=useState(null),[form,setForm]=useState({contractorId:"",projectId:"",type:"fechado",totalValue:0,description:""}),[cf,cd]=useConfirm();
+  const openNew=()=>{setForm({contractorId:contractors[0]?.id||"",projectId:projects[0]?.id||"",type:"fechado",totalValue:0,description:""});setEdit(null);setModal(true);};
+  const openEdit=c=>{setForm({contractorId:c.contractorId,projectId:c.projectId,type:c.type,totalValue:c.totalValue,description:c.description||""});setEdit(c.id);setModal(true);};
+  const save=async()=>{if(!form.contractorId||!form.projectId)return;const d={...form,totalValue:Number(form.totalValue)};if(edit){await ctApi.update(edit,d);}else{await ctApi.insert({...d,id:genId()});}setModal(false);};
+  const getName=id=>contractors.find(c=>c.id===id)?.name||"-";
+  const getProj=id=>projects.find(p=>p.id===id)?.name||"-";
+  const getPaid=cid=>payments.filter(p=>p.contractId===cid).reduce((s,p)=>s+(Number(p.amount)||0),0);
+  const rm=async id=>{if(await cf("Remover este contrato?"))await ctApi.remove(id);};
+  return(<div>
+    {IS_ADMIN&&<div style={{display:"flex",justifyContent:"flex-end",marginBottom:20}}><button onClick={openNew} style={btnPrimary}>+ Novo Contrato</button></div>}
+    {contracts.length===0?<EmptyState icon={"\u{1F4CB}"} text="Nenhum contrato cadastrado."/>:
+    <div style={{display:"grid",gap:12}}>{contracts.map(c=>{
+      const paid=getPaid(c.id),pct=c.totalValue>0?Math.min(100,(paid/c.totalValue)*100):0;
+      const last3=[...payments].filter(p=>p.contractId===c.id).sort((a,b)=>b.date>a.date?1:-1).slice(0,3);
+      return(<Card key={c.id} style={{padding:"18px 24px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
+          <div><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}><span style={{fontWeight:700,fontSize:15,color:"#f8fafc"}}>{getName(c.contractorId)}</span><StatusBadge type={c.type}/></div><div style={{fontSize:13,color:"#94a3b8"}}>Obra: {getProj(c.projectId)}</div>{c.description&&<div style={{fontSize:12,color:"#64748b",marginTop:2}}>{c.description}</div>}</div>
+          <div style={{textAlign:"right"}}><div style={{fontSize:13,color:"#94a3b8",marginBottom:4}}>Valor do contrato</div><div style={{fontSize:18,fontWeight:800,color:"#f8fafc"}}>{fmt(c.totalValue)}</div></div>
+        </div>
+        <div style={{marginTop:14,display:"flex",gap:12,flexWrap:"wrap"}}>
+          <div style={{flex:"0 0 auto",minWidth:140,padding:"12px 16px",borderRadius:10,background:"linear-gradient(135deg,#22c55e18,#16a34a10)",border:"1px solid #22c55e30",display:"flex",flexDirection:"column",justifyContent:"center"}}><div style={{fontSize:10,color:"#86efac",fontWeight:700,textTransform:"uppercase",marginBottom:4}}>Total Pago</div><div style={{fontSize:18,fontWeight:800,color:"#22c55e"}}>{fmt(paid)}</div></div>
+          <div style={{flex:"1 1 200px",minWidth:200,display:"flex",flexDirection:"column",gap:6}}><div style={{fontSize:11,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",marginBottom:2}}>Ultimos Pagamentos</div>
+          {last3.length===0?<div style={{fontSize:12,color:"#475569",fontStyle:"italic"}}>Nenhum pagamento</div>:last3.map(p=>(<div key={p.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 12px",borderRadius:8,background:"#0f172a",border:"1px solid #1e293b"}}><span style={{fontSize:12,color:"#94a3b8"}}>{fmtDate(p.date)}</span><span style={{fontSize:13,fontWeight:700,color:"#f8fafc"}}>{fmt(p.amount)}</span></div>))}</div>
+        </div>
+        {c.type==="fechado"&&c.totalValue>0&&<div style={{marginTop:12}}><div style={{height:6,background:"#334155",borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",width:`${pct}%`,background:"linear-gradient(90deg,#2563eb,#22c55e)",borderRadius:3}}/></div><div style={{fontSize:11,color:"#64748b",marginTop:4}}>{pct.toFixed(0)}% pago</div></div>}
+        {IS_ADMIN&&<div style={{marginTop:12,display:"flex",gap:8}}><button onClick={()=>openEdit(c)} style={{...btnSecondary,padding:"6px 14px",fontSize:12}}>Editar</button><button onClick={()=>rm(c.id)} style={{...btnSecondary,padding:"6px 14px",fontSize:12,borderColor:"#ef4444",color:"#ef4444"}}>Remover</button></div>}
+      </Card>);})}</div>}
+    {IS_ADMIN&&<Modal open={modal} onClose={()=>setModal(false)} title={edit?"Editar Contrato":"Novo Contrato"}>
+      <Field label="Empreiteiro"><select style={inputStyle} value={form.contractorId} onChange={e=>setForm({...form,contractorId:e.target.value})}><option value="">Selecione...</option>{contractors.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></Field>
+      <Field label="Obra"><select style={inputStyle} value={form.projectId} onChange={e=>setForm({...form,projectId:e.target.value})}><option value="">Selecione...</option>{projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+      <Field label="Tipo"><select style={inputStyle} value={form.type} onChange={e=>setForm({...form,type:e.target.value})}><option value="fechado">Fechado (Valor Global)</option><option value="aberto">Aberto (Adiantamentos)</option></select></Field>
+      <Field label={form.type==="fechado"?"Valor Total":"Valor Acumulado"}><input type="number" style={inputStyle} value={form.totalValue} onChange={e=>setForm({...form,totalValue:e.target.value})}/></Field>
+      <Field label="Descricao"><input style={inputStyle} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Ex: Alvenaria Bloco A"/></Field>
+      <div style={{display:"flex",gap:12,justifyContent:"flex-end",marginTop:20}}><button onClick={()=>setModal(false)} style={btnSecondary}>Cancelar</button><button onClick={save} style={btnPrimary}>{edit?"Salvar":"Criar"}</button></div>
+    </Modal>}{cd}</div>);
+}
+
+// ─── PAYMENTS ───
+function Payments({contractors,projects,contracts,payments,pmApi,ctApi}){
+  const[modal,setModal]=useState(false),[editId,setEditId]=useState(null),[form,setForm]=useState({contractId:"",amount:0,date:today()}),[filterDate,setFilterDate]=useState(today()),[calOpen,setCalOpen]=useState(false),[cf,cd]=useConfirm();
+  const openNew=()=>{setForm({contractId:contracts[0]?.id||"",amount:0,date:filterDate});setEditId(null);setModal(true);};
+  const openEdit=p=>{setForm({contractId:p.contractId,amount:p.amount,date:p.date});setEditId(p.id);setModal(true);};
+  const save=async()=>{if(!form.contractId||!form.amount)return;if(editId){await pmApi.update(editId,{...form,amount:Number(form.amount)});}else{await pmApi.insert({...form,id:genId(),amount:Number(form.amount)});const ct=contracts.find(c=>c.id===form.contractId);if(ct&&ct.type==="aberto"){const tot=payments.filter(p=>p.contractId===ct.id).reduce((s,p)=>s+Number(p.amount),0)+Number(form.amount);await ctApi.update(ct.id,{...ct,totalValue:tot});}}setModal(false);setEditId(null);};
+  const getLabel=c=>{const con=contractors.find(x=>x.id===c.contractorId),proj=projects.find(x=>x.id===c.projectId),desc=c.description?` - ${c.description}`:"";return`${con?.name||"?"} | ${proj?.name||"?"}${desc} (${c.type==="fechado"?"Fechado":"Aberto"})`;};
+  const rm=async id=>{if(await cf("Remover pagamento?"))await pmApi.remove(id);};
+  const filtered=payments.filter(p=>p.date===filterDate),dayTotal=filtered.reduce((s,p)=>s+(Number(p.amount)||0),0);
+  return(<div>
+    <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap",alignItems:"flex-end"}}><div><label style={labelStyle}>Data</label><button onClick={()=>setCalOpen(!calOpen)} style={{...inputStyle,width:200,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}><span>{fmtDate(filterDate)}</span><span style={{fontSize:11,color:"#64748b"}}>{calOpen?"\u25B2":"\u25BC"}</span></button></div><div style={{flex:1}}/><button onClick={openNew} style={{...btnPrimary,marginBottom:16}}>+ Registrar Pagamento</button></div>
+    {calOpen&&<div style={{marginBottom:20,maxWidth:380}}><PaymentCalendar selectedDate={filterDate} onSelect={d=>{setFilterDate(d);setCalOpen(false);}} payments={payments}/></div>}
+    <div style={{fontSize:13,color:"#94a3b8",marginBottom:16}}>Pagamentos de <strong style={{color:filterDate===today()?"#3b82f6":"#f8fafc"}}>{filterDate===today()?"hoje":fmtDate(filterDate)}</strong>{filtered.length>0&&<> | Total: <strong style={{color:"#22c55e"}}>{fmt(dayTotal)}</strong></>}</div>
+    {filtered.length===0?<EmptyState icon={"\u{1F4B0}"} text={`Nenhum pagamento em ${fmtDate(filterDate)}.`}/>:
+    <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+      <thead><tr style={{borderBottom:"2px solid #334155"}}>{["Empreiteiro","Obra","Tipo","Valor","Descricao",...(IS_ADMIN?[""]:[])]  .map(h=><th key={h||"act"} style={{padding:"10px 12px",textAlign:"left",color:"#94a3b8",fontWeight:600,fontSize:11,textTransform:"uppercase"}}>{h}</th>)}</tr></thead>
+      <tbody>{[...filtered].reverse().map(p=>{const ct=contracts.find(c=>c.id===p.contractId),con=contractors.find(c=>c.id===ct?.contractorId),proj=projects.find(x=>x.id===ct?.projectId);return(
+        <tr key={p.id} style={{borderBottom:"1px solid #1e293b"}}><td style={{padding:"10px 12px",color:"#f8fafc",fontWeight:600}}>{con?.name||"-"}</td><td style={{padding:"10px 12px",color:"#cbd5e1"}}>{proj?.name||"-"}</td><td style={{padding:"10px 12px"}}>{ct?<StatusBadge type={ct.type}/>:"-"}</td><td style={{padding:"10px 12px",color:"#22c55e",fontWeight:700}}>{fmt(p.amount)}</td><td style={{padding:"10px 12px",color:"#94a3b8"}}>{ct?.description||"-"}</td>
+        {IS_ADMIN&&<td style={{padding:"10px 12px",display:"flex",gap:6}}><button onClick={()=>openEdit(p)} style={{background:"none",border:"none",color:"#3b82f6",cursor:"pointer",fontSize:12,fontWeight:600}}>{"\u270E"}</button><button onClick={()=>rm(p.id)} style={{background:"none",border:"none",color:"#ef4444",cursor:"pointer",fontSize:14}}>{"\u2715"}</button></td>}</tr>);})
+      }<tr style={{borderTop:"2px solid #3b82f6"}}><td colSpan={3} style={{padding:12,textAlign:"right",fontWeight:800,color:"#3b82f6",fontSize:14}}>TOTAL:</td><td colSpan={IS_ADMIN?3:2} style={{padding:12,fontWeight:800,color:"#3b82f6",fontSize:16}}>{fmt(dayTotal)}</td></tr>
+      </tbody></table></div>}
+    <Modal open={modal} onClose={()=>{setModal(false);setEditId(null);}} title={editId?"Editar Pagamento":"Registrar Pagamento"}>
+      <Field label="Contrato"><select style={inputStyle} value={form.contractId} onChange={e=>setForm({...form,contractId:e.target.value})}><option value="">Selecione...</option>{contracts.map(c=><option key={c.id} value={c.id}>{getLabel(c)}</option>)}</select></Field>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Valor (R$)"><input type="number" style={inputStyle} value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})}/></Field><Field label="Data"><input type="date" style={inputStyle} value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/></Field></div>
+      <Field label="Descricao do Contrato"><div style={{...inputStyle,background:"#0f172a88",color:form.contractId?"#cbd5e1":"#475569",minHeight:40,display:"flex",alignItems:"center"}}>{form.contractId?(contracts.find(c=>c.id===form.contractId)?.description||"Sem descricao"):"Selecione um contrato"}</div></Field>
+      <div style={{display:"flex",gap:12,justifyContent:"flex-end",marginTop:20}}><button onClick={()=>{setModal(false);setEditId(null);}} style={btnSecondary}>Cancelar</button><button onClick={save} style={btnPrimary}>{editId?"Salvar":"Confirmar"}</button></div>
+    </Modal>{cd}</div>);
+}
+
+// ─── PAY LIST ───
+function PayList({contractors,projects,contracts,payments}){
+  const[sd,setSd]=useState(today()),[sp,setSp]=useState("all"),[co,setCo]=useState(false);
+  const dp=payments.filter(p=>p.date===sd&&(sp==="all"||contracts.find(c=>c.id===p.contractId)?.projectId===sp));
+  const g={};dp.forEach(p=>{const ct=contracts.find(c=>c.id===p.contractId);if(!ct)return;const con=contractors.find(c=>c.id===ct.contractorId);if(!con)return;if(!g[con.id])g[con.id]={contractor:con,items:[],total:0};const proj=projects.find(x=>x.id===ct.projectId);g[con.id].items.push({...p,project:proj?.name||"-",contractDesc:ct.description||""});g[con.id].total+=Number(p.amount);});
+  const entries=Object.values(g),gt=entries.reduce((s,e)=>s+e.total,0);
+  const whatsapp=()=>{let m=`*GUERREIRA PAY*\n*Lista de Pagamento*\nData: *${fmtDate(sd)}*\n--------------------------------\n\n`;entries.forEach(e=>{m+=`*${e.contractor.name}*\nCPF: ${e.contractor.cpf||""}\n`;if(e.contractor.bank)m+=`Banco: ${e.contractor.bank}\n`;m+=`Ag: ${e.contractor.bankAgency||""} | Conta: ${e.contractor.bankAccount||""}\n`;if(e.contractor.pixKey)m+=`Pix: ${e.contractor.pixKey}\n`;m+=`\n`;e.items.forEach(i=>{const ref=i.contractDesc?` - ref. ${i.contractDesc}`:"";m+=`Obra: ${i.project}\nValor: *${fmt(i.amount)}*${ref}\n`;});if(e.items.length>1)m+=`\nSubtotal ${e.contractor.name}: *${fmt(e.total)}*\n`;m+=`\n`;});m+=`--------------------------------\n*TOTAL GERAL: ${fmt(gt)}*\n\n_Guerreira Pay_`;window.open(`https://wa.me/?text=${encodeURIComponent(m)}`,"_blank");};
+  return(<div>
+    <Card style={{marginBottom:20}}><div style={{display:"flex",gap:16,alignItems:"flex-end",flexWrap:"wrap"}}><div><label style={labelStyle}>Data</label><button onClick={()=>setCo(!co)} style={{...inputStyle,width:200,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}><span>{fmtDate(sd)}</span><span style={{fontSize:11,color:"#64748b"}}>{co?"\u25B2":"\u25BC"}</span></button></div><Field label="Filtrar por Obra"><select style={{...inputStyle,width:220}} value={sp} onChange={e=>setSp(e.target.value)}><option value="all">Todas</option>{projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field><button onClick={whatsapp} style={{...btnPrimary,background:"linear-gradient(135deg,#25D366,#128C7E)",marginBottom:16}} disabled={!entries.length}>WhatsApp</button></div>{co&&<div style={{marginTop:16,maxWidth:380}}><PaymentCalendar selectedDate={sd} onSelect={d=>{setSd(d);setCo(false);}} payments={payments}/></div>}</Card>
+    {!entries.length?<EmptyState icon={"\u{1F4C4}"} text={`Nenhum pagamento para ${fmtDate(sd)}.`}/>:
+    <Card><h3 style={{margin:"0 0 4px",fontSize:16,fontWeight:700,color:"#f8fafc"}}>Lista - {fmtDate(sd)}</h3><p style={{margin:"0 0 16px",fontSize:13,color:"#64748b"}}>{entries.length} empreiteiro(s) | Total: {fmt(gt)}</p>
+    <div style={{display:"grid",gap:16}}>{entries.map(e=>(<div key={e.contractor.id} style={{padding:16,borderRadius:10,background:"#0f172a",border:"1px solid #1e293b"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8,marginBottom:12}}><div><div style={{fontWeight:700,fontSize:15,color:"#f8fafc"}}>{e.contractor.name}</div><div style={{fontSize:12,color:"#94a3b8",marginTop:2}}>CPF: {e.contractor.cpf}{e.contractor.bank&&` | ${e.contractor.bank}`}</div><div style={{fontSize:12,color:"#64748b",marginTop:1}}>Ag: {e.contractor.bankAgency} | Conta: {e.contractor.bankAccount}{e.contractor.pixKey&&` | Pix: ${e.contractor.pixKey}`}</div></div>
+      {e.items.length>1&&<div style={{padding:"4px 12px",borderRadius:8,background:"#3b82f618",border:"1px solid #3b82f633"}}><span style={{fontSize:12,fontWeight:700,color:"#3b82f6"}}>Subtotal: {fmt(e.total)}</span></div>}</div>
+      <div style={{display:"grid",gap:8}}>{e.items.map(i=>(<div key={i.id} style={{padding:"10px 14px",borderRadius:8,background:"#1e293b",border:"1px solid #334155"}}><div style={{fontSize:13,fontWeight:600,color:"#cbd5e1",marginBottom:4}}>{i.project}</div><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><span style={{fontSize:16,fontWeight:800,color:"#22c55e"}}>{fmt(i.amount)}</span>{i.contractDesc&&<span style={{fontSize:12,color:"#94a3b8"}}>referente {i.contractDesc}</span>}</div></div>))}</div>
+    </div>))}</div>
+    <div style={{marginTop:16,padding:"14px 16px",borderRadius:10,background:"linear-gradient(135deg,#3b82f618,#1d4ed810)",border:"1px solid #3b82f633",display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontSize:14,fontWeight:700,color:"#3b82f6"}}>TOTAL GERAL</span><span style={{fontSize:20,fontWeight:800,color:"#3b82f6"}}>{fmt(gt)}</span></div>
+    </Card>}</div>);
+}
+
+// ─── USERS (admin only) ───
+function Users(){
+  const[users,setUsers]=useState([]);const[loading,setLoading]=useState(true);const[cf,cd]=useConfirm();
+  useEffect(()=>{loadUsers();},[]);
+  const loadUsers=async()=>{setLoading(true);try{const{data,error}=await sb.auth.admin.listUsers();if(!error&&data?.users)setUsers(data.users);else{
+    // Fallback: admin.listUsers requires service_role key; use a workaround
+    // Store users in a custom table instead
+    const{data:rows}=await sb.from('app_users').select('*').order('created_at',{ascending:true});
+    if(rows)setUsers(rows);
+  }}catch(e){}setLoading(false);};
+  // Since admin.listUsers won't work with anon key, we use Supabase auth user metadata
+  // The Users tab will show a message to manage users through the menu
+  return(<div>
+    <Card>
+      <h3 style={{margin:"0 0 16px",fontSize:16,fontWeight:700,color:"#f8fafc"}}>Gerenciamento de Usuarios</h3>
+      <p style={{color:"#94a3b8",fontSize:13,marginBottom:20}}>Para criar novos usuarios, use o menu <strong style={{color:"#3b82f6"}}>Menu &gt; Criar novo usuario</strong> no topo da tela.</p>
+      <div style={{padding:16,borderRadius:10,background:"#0f172a",border:"1px solid #1e293b",marginBottom:12}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#f8fafc",marginBottom:8}}>Tipos de acesso:</div>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+          <div style={{flex:1,minWidth:200,padding:12,borderRadius:8,background:"#1e293b",border:"1px solid #334155"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}><span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,fontSize:10,fontWeight:700,background:"#2563eb22",color:"#3b82f6"}}>Admin</span></div>
+            <ul style={{fontSize:12,color:"#94a3b8",paddingLeft:16,margin:0,lineHeight:1.8}}>
+              <li>Acesso total ao sistema</li>
+              <li>Painel com resumo dos contratos</li>
+              <li>Gerenciar obras e contratos</li>
+              <li>Criar e gerenciar usuarios</li>
+              <li>Editar e excluir pagamentos</li>
+            </ul>
+          </div>
+          <div style={{flex:1,minWidth:200,padding:12,borderRadius:8,background:"#1e293b",border:"1px solid #334155"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}><span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,fontSize:10,fontWeight:700,background:"#22c55e22",color:"#22c55e"}}>Administrativo</span></div>
+            <ul style={{fontSize:12,color:"#94a3b8",paddingLeft:16,margin:0,lineHeight:1.8}}>
+              <li>Cadastrar empreiteiros</li>
+              <li>Registrar pagamentos</li>
+              <li>Visualizar contratos (sem editar)</li>
+              <li>Gerar lista de pagamento</li>
+              <li>Enviar WhatsApp</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p style={{color:"#64748b",fontSize:11,fontStyle:"italic"}}>Para alterar o tipo de acesso de um usuario, crie um novo com o tipo desejado pelo menu.</p>
+    </Card>{cd}
+  </div>);
+}
+
+// ─── MAIN APP ───
+function App(){
+  const defaultTab=IS_ADMIN?"dashboard":"contractors";
+  const[tab,setTab]=useState(defaultTab);
+  const cApi=useSupabase('contractors',contractorFields);
+  const pApi=useSupabase('projects',projectFields);
+  const ctApi=useSupabase('contracts',contractFields);
+  const pmApi=useSupabase('payments',paymentFields);
+  const loaded=cApi.loaded&&pApi.loaded&&ctApi.loaded&&pmApi.loaded;
+  useEffect(()=>{const i=setInterval(()=>{cApi.reload();pApi.reload();ctApi.reload();pmApi.reload();},30000);return()=>clearInterval(i);},[]);
+  if(!loaded)return(<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628"}}><div style={{textAlign:"center"}}><GuerreiraLogo size={64}/><div style={{marginTop:12,fontWeight:800,fontSize:20,color:"#f8fafc"}}>Guerreira Pay</div><div style={{fontSize:12,color:"#64748b",marginTop:4}}>Carregando dados...</div></div></div>);
+  const props={contractors:cApi.data,projects:pApi.data,contracts:ctApi.data,payments:pmApi.data,cApi,pApi,ctApi,pmApi};
+  return(<div style={{minHeight:"100vh",background:"#0f172a",fontFamily:"'DM Sans',sans-serif",color:"#e2e8f0",paddingBottom:80}}>
+    <main style={{padding:"20px 16px",maxWidth:1100,margin:"0 auto",width:"100%"}}>
+      {tab==="dashboard"&&IS_ADMIN&&<Dashboard {...props}/>}
+      {tab==="contractors"&&<Contractors {...props}/>}
+      {tab==="projects"&&<Projects {...props}/>}
+      {tab==="contracts"&&<Contracts {...props}/>}
+      {tab==="payments"&&<Payments {...props}/>}
+      {tab==="paylist"&&<PayList {...props}/>}
+      {tab==="users"&&IS_ADMIN&&<Users/>}
+    </main>
+    <nav style={{position:"fixed",bottom:0,left:0,right:0,zIndex:100,background:"#0f1d32",borderTop:"1px solid #1e3a5f",display:"flex",justifyContent:"space-around",alignItems:"center",padding:"6px 0 8px"}}>
+      {TABS.map(t=>{const a=tab===t.id;return(<button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"6px 6px",minWidth:44,position:"relative",fontFamily:"'DM Sans',sans-serif"}}>
+        {a&&<div style={{position:"absolute",top:-1,left:"50%",transform:"translateX(-50%)",width:28,height:3,borderRadius:"0 0 3px 3px",background:"linear-gradient(90deg,#2563eb,#1d4ed8)"}}/>}
+        <span style={{fontSize:18,lineHeight:1,filter:a?"none":"grayscale(1) opacity(0.5)"}}>{t.icon}</span>
+        <span style={{fontSize:7,fontWeight:a?800:500,color:a?"#3b82f6":"#64748b"}}>{t.label}</span>
+      </button>);})}
+    </nav>
+  </div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
