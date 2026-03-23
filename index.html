@@ -24,6 +24,8 @@ const ADMIN_EMAILS=['rodolfo_alexandre@ymail.com'];
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const isAdm=u=>{if(!u)return false;if(ADMIN_EMAILS.includes(u.email?.toLowerCase()))return true;return u.user_metadata?.role==='admin';};
 
+// Logo principal
+function GCLogo({size=60}){return(<svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" textAnchor="middle" fill="#2b5797" fontSize="10" fontWeight="900" fontFamily="Arial">GUERREIRA</text><text x="50" y="94" textAnchor="middle" fill="#8fa4b8" fontSize="6" fontWeight="600" fontFamily="Arial">CONSTRUTORA</text></svg>);}
 function useDB(table,fieldMap){
   const[data,setData]=useState([]);const[loaded,setLoaded]=useState(false);
   const load=useCallback(async()=>{const{data:rows}=await sb.from(table).select('*').order('created_at',{ascending:true});if(rows){setData(rows.map(r=>{const o={};Object.entries(fieldMap).forEach(([j,d])=>{o[j]=r[d]});return o}));}setLoaded(true);},[table]);
@@ -334,9 +336,6 @@ function LoginScreen({onLogin}){
     </div>
   </div>);
 }
-
-// LOGO
-function GCLogo({size=60}){return(<svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" textAnchor="middle" fill="#2b5797" fontSize="10" fontWeight="900" fontFamily="Arial">GUERREIRA</text><text x="50" y="94" textAnchor="middle" fill="#8fa4b8" fontSize="6" fontWeight="600" fontFamily="Arial">CONSTRUTORA</text></svg>);}
 
 // MENU
 function MainMenu({onSelect,user}){
