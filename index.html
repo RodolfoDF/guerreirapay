@@ -1,268 +1,374 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Guerreira Pay</title>
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Guerreira Pay" />
-  <meta name="theme-color" content="#0a1628" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+  <title>Guerreira Construtora</title>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="theme-color" content="#0a1628"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:#0a1628;color:#e2e8f0;min-height:100vh;-webkit-tap-highlight-color:transparent}
-    .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a1628,#0f1d32,#162544);padding:20px}
-    .auth-card{background:#1e293b;border-radius:20px;padding:40px 32px;width:400px;max-width:100%;box-shadow:0 25px 60px rgba(0,0,0,.4)}
-    .auth-logo{text-align:center;margin-bottom:28px}
-    .auth-title{font-size:24px;font-weight:800;color:#f8fafc;text-align:center;margin-bottom:4px}
-    .auth-subtitle{font-size:12px;color:#64748b;text-align:center;margin-bottom:28px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
-    .auth-input{width:100%;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#e2e8f0;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px;-webkit-appearance:none}
-    .auth-input:focus{border-color:#2563eb}
-    .auth-input::placeholder{color:#475569}
-    .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
-    .auth-btn:disabled{opacity:.5}
-    .auth-link{display:block;text-align:center;margin-top:16px;color:#3b82f6;font-size:14px;cursor:pointer;font-weight:600;background:none;border:none;font-family:'DM Sans',sans-serif;padding:8px}
-    .auth-error{background:#ef444422;border:1px solid #ef444444;border-radius:8px;padding:10px 14px;color:#fca5a5;font-size:13px;margin-bottom:14px;text-align:center}
-    .auth-success{background:#22c55e22;border:1px solid #22c55e44;border-radius:8px;padding:10px 14px;color:#86efac;font-size:13px;margin-bottom:14px;text-align:center}
-    .auth-label{display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px}
-    .pw-field{position:relative}.pw-field .auth-input{padding-right:44px}
-    .pw-toggle{position:absolute;right:12px;top:12px;background:none;border:none;color:#64748b;cursor:pointer;font-size:18px;padding:4px}
-    .top-bar{background:#0a1628;border-bottom:1px solid #1e3a5f;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:50}
-    .user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
-    .menu-btn{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 14px;color:#94a3b8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
-    .dropdown{position:absolute;top:100%;right:0;margin-top:6px;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:8px;min-width:220px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none}
-    .dropdown.open{display:block}
-    .dd-item{display:block;width:100%;padding:10px 12px;background:none;border:none;color:#cbd5e1;font-size:13px;cursor:pointer;border-radius:6px;text-align:left;font-family:'DM Sans',sans-serif;font-weight:500}
-    .dd-item:hover{background:#334155}
-    .dd-item.danger{color:#f87171}
-    .dd-header{padding:10px 12px;border-bottom:1px solid #334155;margin-bottom:4px}
-    .role-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-    .role-badge.admin{background:#2563eb22;color:#3b82f6}
-    .role-badge.user{background:#22c55e22;color:#22c55e}
-    .spinner{width:32px;height:32px;border:3px solid #334155;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:#0a1628;color:#e2e8f0;min-height:100vh}#root{min-height:100vh}@keyframes spin{to{transform:rotate(360deg)}}</style>
 </head>
 <body>
-
-<div id="auth-screen"></div>
-<div id="app-screen" style="display:none">
-  <div class="top-bar">
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="user-avatar" id="userAvatar"></div>
-      <div><div id="userName" style="font-size:12px;color:#94a3b8;font-weight:600"></div><div id="userRole" style="font-size:9px;color:#3b82f6;font-weight:700;text-transform:uppercase"></div></div>
-    </div>
-    <div style="position:relative">
-      <button class="menu-btn" id="menuBtn">Menu &#9662;</button>
-      <div class="dropdown" id="menuDropdown">
-        <div class="dd-header">
-          <div id="ddName" style="font-size:13px;font-weight:700;color:#f8fafc"></div>
-          <div id="ddEmail" style="font-size:11px;color:#64748b"></div>
-          <div style="margin-top:4px"><span class="role-badge" id="ddBadge"></span></div>
-        </div>
-        <div id="ddAdminItems"></div>
-        <button class="dd-item" id="btnChangePw">Alterar senha</button>
-        <button class="dd-item danger" id="btnLogout">Sair</button>
-      </div>
-    </div>
-  </div>
-  <iframe id="appFrame" style="width:100%;border:none"></iframe>
-</div>
-
-<script type="module">
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useEffect,useCallback,useMemo}=React;
 const SUPABASE_URL='https://sgckmmhtbtpjaszbwcyo.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnY2ttbWh0YnRwamFzemJ3Y3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MDg3NzIsImV4cCI6MjA4OTI4NDc3Mn0.P3Gn5yNhmCaVSyRdlT_XD9qBjY6JB7kpLTdOFT5lY5Q';
 const ADMIN_EMAILS=['rodolfo_alexandre@ymail.com'];
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const isAdm=u=>{if(!u)return false;if(ADMIN_EMAILS.includes(u.email?.toLowerCase()))return true;return u.user_metadata?.role==='admin';};
 
-function logo(s=80){return`<svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8" stroke="#6b839a" stroke-width="0.5"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797" stroke="#1e3f6e" stroke-width="0.5"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5" stroke="#2b5797" stroke-width="0.5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" text-anchor="middle" fill="#2b5797" font-size="11" font-weight="900" font-family="Arial" letter-spacing="1">GUERREIRA</text><text x="50" y="94" text-anchor="middle" fill="#8fa4b8" font-size="7" font-weight="600" font-family="Arial" letter-spacing="2">PAY</text></svg>`}
-
-const authScreen=document.getElementById('auth-screen');
-const appScreen=document.getElementById('app-screen');
-const appFrame=document.getElementById('appFrame');
-
-function isAdmin(u){
-  if(!u)return false;
-  if(ADMIN_EMAILS.includes(u.email?.toLowerCase()))return true;
-  return u.user_metadata?.role==='admin';
+function useDB(table,fieldMap){
+  const[data,setData]=useState([]);const[loaded,setLoaded]=useState(false);
+  const load=useCallback(async()=>{const{data:rows}=await sb.from(table).select('*').order('created_at',{ascending:true});if(rows){setData(rows.map(r=>{const o={};Object.entries(fieldMap).forEach(([j,d])=>{o[j]=r[d]});return o}));}setLoaded(true);},[table]);
+  useEffect(()=>{load();},[load]);
+  const insert=useCallback(async item=>{const row={};Object.entries(fieldMap).forEach(([j,d])=>{if(item[j]!==undefined)row[d]=item[j]});const{data:ins}=await sb.from(table).insert(row).select().single();if(ins){const o={};Object.entries(fieldMap).forEach(([j,d])=>{o[j]=ins[d]});setData(p=>[...p,o]);return o}return null},[table,fieldMap]);
+  const update=useCallback(async(id,item)=>{const row={};Object.entries(fieldMap).forEach(([j,d])=>{if(item[j]!==undefined)row[d]=item[j]});await sb.from(table).update(row).eq('id',id);setData(p=>p.map(d=>d.id===id?{...d,...item}:d));},[table,fieldMap]);
+  const remove=useCallback(async id=>{await sb.from(table).delete().eq('id',id);setData(p=>p.filter(d=>d.id!==id));},[table]);
+  return{data,loaded,insert,update,remove,reload:load};
 }
 
-function resizeFrame(){
-  const bar=document.querySelector('.top-bar');
-  if(bar&&appFrame){appFrame.style.height=(window.innerHeight-bar.offsetHeight)+'px';}
+// Pay field maps
+const payF={
+  contractors:{id:'id',name:'name',cpf:'cpf',bank:'bank',bankAgency:'bank_agency',bankAccount:'bank_account',pixKey:'pix_key'},
+  projects:{id:'id',name:'name',address:'address',status:'status'},
+  contracts:{id:'id',contractorId:'contractor_id',projectId:'project_id',type:'type',totalValue:'total_value',description:'description'},
+  payments:{id:'id',contractId:'contract_id',amount:'amount',date:'date',note:'note'},
+};
+// Transport field maps
+const transF={
+  obras:{id:'id',cliente:'cliente',endereco:'endereco',ativa:'ativa'},
+  func:{id:'id',nome:'nome',cpf:'cpf',cidade:'cidade',tipo:'tipo',cargo:'cargo',obraId:'obra_id'},
+  trechos:{id:'id',funcionarioId:'funcionario_id',descricao:'descricao',valorIda:'valor_ida',valorVolta:'valor_volta'},
+  lanc:{id:'id',obraId:'obra_id',funcionarioId:'funcionario_id',data:'data',valor:'valor',tipo:'tipo',descricao:'descricao',comprovanteUrl:'comprovante_url'},
+};
+
+// ─── HELPERS ───
+const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const fmt = (v) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v || 0);
+const fmtDate = (d) => { if (!d) return "-"; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
+const cpfMask = (v) => v.replace(/\D/g, "").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2").slice(0, 14);
+const today = () => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; };
+
+// ─── LOCAL STORAGE HOOK ───
+  const insert = useCallback((item) => { setData((p) => [...p, item]); return item; }, []);
+  const update = useCallback((id, item) => setData((p) => p.map((d) => d.id === id ? { ...d, ...item } : d)), []);
+  const remove = useCallback((id) => setData((p) => p.filter((d) => d.id !== id)), []);
+  return { data, insert, update, remove, reload: () => {} };
+}
+// ─── SHARED COMPONENTS ───
+const iS = { width: "100%", padding: "10px 14px", background: "#0f172a", border: "1px solid #334155", borderRadius: 8, color: "#e2e8f0", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
+const lS = { display: "block", fontSize: 12, fontWeight: 600, color: "#94a3b8", marginBottom: 6 };
+const bP = { padding: "10px 20px", background: "linear-gradient(135deg,#2563eb,#1d4ed8)", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" };
+const bS = { padding: "10px 20px", background: "transparent", border: "1px solid #475569", borderRadius: 8, color: "#cbd5e1", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" };
+
+function Fld({ label, children }) { return <div style={{ marginBottom: 16 }}><label style={lS}>{label}</label>{children}</div>; }
+function Card({ children, style: s }) { return <div style={{ background: "#1e293b", borderRadius: 14, padding: 20, boxShadow: "0 1px 3px rgba(0,0,0,.2)", ...s }}>{children}</div>; }
+function Badge({ type }) { const c = { ativo: "#22c55e", concluido: "#3b82f6", cancelado: "#ef4444", aberto: "#f59e0b", fechado: "#8b5cf6" }; const l = { ativo: "Ativo", concluido: "Concluido", cancelado: "Cancelado", aberto: "Aberto", fechado: "Fechado" }; return <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: (c[type] || "#64748b") + "22", color: c[type] || "#64748b" }}>{l[type] || type}</span>; }
+function Modal({ open, onClose, title, children }) { if (!open) return null; return (<div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(15,23,42,.6)", backdropFilter: "blur(4px)" }}><div onClick={(e) => e.stopPropagation()} style={{ background: "#1e293b", borderRadius: 16, padding: "24px 28px", width: 460, maxWidth: "94vw", maxHeight: "85vh", overflowY: "auto", color: "#e2e8f0" }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#f8fafc" }}>{title}</h2><button onClick={onClose} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 20, cursor: "pointer" }}>X</button></div>{children}</div></div>); }
+
+function Cal({ selectedDate, onSelect, items, dateField = "date" }) {
+  const [vd, setVd] = useState(() => { const d = new Date(selectedDate + "T12:00:00"); return { y: d.getFullYear(), m: d.getMonth() }; });
+  const dates = useMemo(() => { const s = new Set(); items.forEach((l) => s.add(l[dateField])); return s; }, [items, dateField]);
+  const dim = new Date(vd.y, vd.m + 1, 0).getDate(), fdw = new Date(vd.y, vd.m, 1).getDay();
+  const mn = new Date(vd.y, vd.m).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const cells = []; for (let i = 0; i < fdw; i++) cells.push(null); for (let d = 1; d <= dim; d++) cells.push(d); const ts = today();
+  return (<div style={{ background: "#1e293b", borderRadius: 14, padding: 16 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+      <button onClick={() => setVd((v) => { const d = new Date(v.y, v.m - 1, 1); return { y: d.getFullYear(), m: d.getMonth() }; })} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 20, cursor: "pointer" }}>{"<"}</button>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 14, fontWeight: 700, color: "#f8fafc", textTransform: "capitalize" }}>{mn}</span><button onClick={() => { const n = new Date(); setVd({ y: n.getFullYear(), m: n.getMonth() }); onSelect(today()); }} style={{ background: "#2563eb22", border: "1px solid #2563eb44", borderRadius: 6, color: "#3b82f6", fontSize: 10, fontWeight: 700, padding: "3px 8px", cursor: "pointer" }}>HOJE</button></div>
+      <button onClick={() => setVd((v) => { const d = new Date(v.y, v.m + 1, 1); return { y: d.getFullYear(), m: d.getMonth() }; })} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 20, cursor: "pointer" }}>{">"}</button>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>{["D", "S", "T", "Q", "Q", "S", "S"].map((d, i) => <div key={i} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: "#64748b", padding: "4px 0" }}>{d}</div>)}</div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>{cells.map((day, i) => { if (!day) return <div key={`e${i}`} />; const ds = `${vd.y}-${String(vd.m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`; const sel = ds === selectedDate, td = ds === ts, hp = dates.has(ds); return (<button key={day} onClick={() => onSelect(ds)} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "5px 2px", minHeight: 36, borderRadius: 8, cursor: "pointer", background: sel ? "linear-gradient(135deg,#2563eb,#1d4ed8)" : hp ? "#22c55e18" : "transparent", border: td && !sel ? "1px solid #3b82f666" : hp && !sel ? "1px solid #22c55e30" : "1px solid transparent" }}><span style={{ fontSize: 12, fontWeight: sel || hp ? 700 : 400, color: sel ? "#fff" : td ? "#3b82f6" : hp ? "#4ade80" : "#cbd5e1" }}>{day}</span>{hp && <div style={{ width: 4, height: 4, borderRadius: "50%", background: sel ? "#fff" : "#22c55e", marginTop: 1 }} />}</button>); })}</div>
+  </div>);
 }
 
-// ─── Show Login ───
-function showLogin(error,success){
-  appScreen.style.display='none';
-  authScreen.style.display='block';
-  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
-    <div class="auth-logo">${logo(80)}</div>
-    <div class="auth-title">Guerreira Pay</div>
-    <div class="auth-subtitle">Gestao de Pagamentos</div>
-    ${error?`<div class="auth-error">${error}</div>`:''}
-    ${success?`<div class="auth-success">${success}</div>`:''}
-    <form id="loginForm">
-      <label class="auth-label">E-mail</label>
-      <input class="auth-input" type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email"/>
-      <label class="auth-label">Senha</label>
-      <div class="pw-field"><input class="auth-input" type="password" id="loginPass" placeholder="Sua senha" required autocomplete="current-password"/></div>
-      <button class="auth-btn" type="submit">Entrar</button>
-    </form>
-    <button class="auth-link" id="forgotLink">Esqueci minha senha</button>
-  </div></div>`;
-  document.getElementById('loginForm').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const email=document.getElementById('loginEmail').value;
-    const pass=document.getElementById('loginPass').value;
-    if(!email||!pass){showLogin('Preencha e-mail e senha.');return;}
-    document.querySelector('.auth-btn').disabled=true;
-    document.querySelector('.auth-btn').textContent='Entrando...';
-    try{
-      const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
-      if(error)throw error;
-      showApp(data.user);
-    }catch(err){showLogin(translateError(err.message));}
-  });
-  document.getElementById('forgotLink').addEventListener('click',()=>showForgot());
+// ═══════════════════════════════════════════
+// PAY MODULE
+// ═══════════════════════════════════════════
+function PayDashboard({ contractors, projects, contracts, payments }) {
+  const active = projects.filter((p) => p.status === "ativo").length;
+  const getPaid = (cid) => payments.filter((p) => p.contractId === cid).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  return (<div>
+    <Card style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 14, padding: "16px 20px" }}><div style={{ width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", background: "#2563eb22", fontSize: 20 }}>🏗️</div><div><div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>Obras Ativas</div><div style={{ fontSize: 20, fontWeight: 800, color: "#f8fafc" }}>{active} <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>de {projects.length}</span></div></div></Card>
+    <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f8fafc", marginBottom: 12 }}>Resumo dos Contratos</h3>
+    {contracts.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13 }}>Nenhum contrato.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{contracts.map((c) => { const con = contractors.find((x) => x.id === c.contractorId); const proj = projects.find((x) => x.id === c.projectId); const paid = getPaid(c.id); const pct = c.totalValue > 0 ? Math.min(100, (paid / c.totalValue) * 100) : 0; return (<Card key={c.id} style={{ padding: "14px 18px" }}><div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}><div><div style={{ fontWeight: 700, fontSize: 14, color: "#f8fafc" }}>{con?.name || "-"}</div><div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{proj?.name || "-"}{c.description && ` - ${c.description}`}</div></div><Badge type={c.type} /></div><div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12 }}><div style={{ padding: "6px 12px", borderRadius: 8, background: "#22c55e15", border: "1px solid #22c55e25" }}><div style={{ fontSize: 8, color: "#86efac", fontWeight: 700 }}>PAGO</div><div style={{ fontSize: 15, fontWeight: 800, color: "#22c55e" }}>{fmt(paid)}</div></div>{c.type === "fechado" && c.totalValue > 0 && <div style={{ flex: 1 }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span style={{ fontSize: 10, color: "#64748b" }}>de {fmt(c.totalValue)}</span><span style={{ fontSize: 10, color: "#64748b" }}>{pct.toFixed(0)}%</span></div><div style={{ height: 4, background: "#334155", borderRadius: 2, overflow: "hidden" }}><div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#2563eb,#22c55e)", borderRadius: 2 }} /></div></div>}</div></Card>); })}</div>}
+  </div>);
 }
 
-// ─── Show Forgot ───
-function showForgot(){
-  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
-    <div class="auth-logo">${logo(64)}</div>
-    <div class="auth-title">Recuperar Senha</div>
-    <div class="auth-subtitle">Guerreira Pay</div>
-    <p style="color:#94a3b8;font-size:13px;margin-bottom:20px;text-align:center">Informe seu e-mail para receber o link.</p>
-    <form id="forgotForm">
-      <label class="auth-label">E-mail</label>
-      <input class="auth-input" type="email" id="forgotEmail" placeholder="seu@email.com" required/>
-      <button class="auth-btn" type="submit">Enviar link</button>
-    </form>
-    <button class="auth-link" id="backLogin">Voltar ao login</button>
-  </div></div>`;
-  document.getElementById('forgotForm').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const email=document.getElementById('forgotEmail').value;
-    try{await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin});showLogin(null,'Link enviado! Verifique seu e-mail.');}
-    catch(err){showLogin(translateError(err.message));}
-  });
-  document.getElementById('backLogin').addEventListener('click',()=>showLogin());
+function PayContractors({ contractors, cApi }) {
+  const [modal, setModal] = useState(false); const [edit, setEdit] = useState(null); const [form, setForm] = useState({ name: "", cpf: "", bank: "", bankAgency: "", bankAccount: "", pixKey: "" }); const [search, setSearch] = useState("");
+  const save = () => { if (!form.name) return; if (edit) cApi.update(edit, form); else cApi.insert({ ...form, id: genId() }); setModal(false); };
+  const filtered = contractors.filter((c) => c.name?.toLowerCase().includes(search.toLowerCase()));
+  return (<div>
+    <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}><input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ ...iS, flex: 1, minWidth: 180 }} /><button onClick={() => { setForm({ name: "", cpf: "", bank: "", bankAgency: "", bankAccount: "", pixKey: "" }); setEdit(null); setModal(true); }} style={bP}>+ Novo</button></div>
+    {filtered.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhum empreiteiro.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{filtered.map((c) => (<Card key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, padding: "14px 18px" }}><div><div style={{ fontWeight: 700, fontSize: 14, color: "#f8fafc" }}>{c.name}</div><div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>CPF: {c.cpf} {c.bank && `| ${c.bank}`} | Ag: {c.bankAgency} | Ct: {c.bankAccount}</div>{c.pixKey && <div style={{ fontSize: 11, color: "#64748b" }}>Pix: {c.pixKey}</div>}</div><div style={{ display: "flex", gap: 6 }}><button onClick={() => { setForm({ name: c.name, cpf: c.cpf || "", bank: c.bank || "", bankAgency: c.bankAgency || "", bankAccount: c.bankAccount || "", pixKey: c.pixKey || "" }); setEdit(c.id); setModal(true); }} style={{ ...bS, padding: "5px 12px", fontSize: 11 }}>Editar</button><button onClick={() => cApi.remove(c.id)} style={{ ...bS, padding: "5px 12px", fontSize: 11, borderColor: "#ef4444", color: "#ef4444" }}>X</button></div></Card>))}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title={edit ? "Editar" : "Novo Empreiteiro"}>
+      <Fld label="Nome"><input style={iS} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Fld>
+      <Fld label="CPF"><input style={iS} value={form.cpf} maxLength={14} onChange={(e) => setForm({ ...form, cpf: cpfMask(e.target.value) })} /></Fld>
+      <Fld label="Banco"><input style={iS} value={form.bank} onChange={(e) => setForm({ ...form, bank: e.target.value })} /></Fld>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}><Fld label="Agencia"><input style={iS} value={form.bankAgency} onChange={(e) => setForm({ ...form, bankAgency: e.target.value })} /></Fld><Fld label="Conta"><input style={iS} value={form.bankAccount} onChange={(e) => setForm({ ...form, bankAccount: e.target.value })} /></Fld></div>
+      <Fld label="Pix"><input style={iS} value={form.pixKey} onChange={(e) => setForm({ ...form, pixKey: e.target.value })} /></Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>{edit ? "Salvar" : "Cadastrar"}</button></div>
+    </Modal></div>);
 }
 
-// ─── Show Register (admin only) ───
-function showRegister(){
-  authScreen.style.display='block';
-  appScreen.style.display='none';
-  authScreen.innerHTML=`<div class="auth-container"><div class="auth-card">
-    <div class="auth-logo">${logo(64)}</div>
-    <div class="auth-title">Novo Usuario</div>
-    <div class="auth-subtitle">Guerreira Pay</div>
-    <div id="regMsg"></div>
-    <form id="regForm">
-      <label class="auth-label">Nome completo</label>
-      <input class="auth-input" type="text" id="regName" placeholder="Nome" required/>
-      <label class="auth-label">E-mail</label>
-      <input class="auth-input" type="email" id="regEmail" placeholder="email@exemplo.com" required/>
-      <label class="auth-label">Senha</label>
-      <input class="auth-input" type="password" id="regPass" placeholder="Minimo 6 caracteres" required minlength="6"/>
-      <label class="auth-label">Confirmar senha</label>
-      <input class="auth-input" type="password" id="regPassC" placeholder="Repita a senha" required minlength="6"/>
-      <label class="auth-label">Tipo de acesso</label>
-      <select class="auth-input" id="regRole"><option value="user">Administrativo</option><option value="admin">Administrador</option></select>
-      <button class="auth-btn" type="submit">Criar usuario</button>
-    </form>
-    <button class="auth-link" id="backApp">Voltar ao app</button>
-  </div></div>`;
-  document.getElementById('regForm').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const nm=document.getElementById('regName').value;
-    const em=document.getElementById('regEmail').value;
-    const pw=document.getElementById('regPass').value;
-    const pc=document.getElementById('regPassC').value;
-    const rl=document.getElementById('regRole').value;
-    const msg=document.getElementById('regMsg');
-    if(pw!==pc){msg.innerHTML='<div class="auth-error">As senhas nao conferem.</div>';return;}
-    document.querySelector('.auth-btn').disabled=true;
-    try{
-      const{error}=await supabase.auth.signUp({email:em,password:pw,options:{data:{name:nm,role:rl}}});
-      if(error)throw error;
-      // Also save to app_users table
-      await supabase.from('app_users').upsert({id:em,email:em,name:nm,role:rl});
-      msg.innerHTML=`<div class="auth-success">Usuario "${nm}" criado com sucesso!</div>`;
-      document.querySelector('.auth-btn').disabled=false;
-    }catch(err){msg.innerHTML=`<div class="auth-error">${translateError(err.message)}</div>`;document.querySelector('.auth-btn').disabled=false;}
-  });
-  document.getElementById('backApp').addEventListener('click',async()=>{
-    const{data:{session}}=await supabase.auth.getSession();
-    if(session?.user)showApp(session.user);else showLogin();
-  });
+function PayContracts({ contractors, projects, contracts, ctApi, payments }) {
+  const [modal, setModal] = useState(false); const [edit, setEdit] = useState(null); const [form, setForm] = useState({ contractorId: "", projectId: "", type: "fechado", totalValue: 0, description: "" });
+  const save = () => { if (!form.contractorId || !form.projectId) return; if (edit) ctApi.update(edit, { ...form, totalValue: Number(form.totalValue) }); else ctApi.insert({ ...form, id: genId(), totalValue: Number(form.totalValue) }); setModal(false); };
+  const getPaid = (cid) => payments.filter((p) => p.contractId === cid).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  return (<div>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}><button onClick={() => { setForm({ contractorId: contractors[0]?.id || "", projectId: projects[0]?.id || "", type: "fechado", totalValue: 0, description: "" }); setEdit(null); setModal(true); }} style={bP}>+ Novo Contrato</button></div>
+    {contracts.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhum contrato.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{contracts.map((c) => { const paid = getPaid(c.id); const pct = c.totalValue > 0 ? Math.min(100, (paid / c.totalValue) * 100) : 0; return (<Card key={c.id} style={{ padding: "14px 18px" }}><div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}><div><div style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={{ fontWeight: 700, color: "#f8fafc" }}>{contractors.find((x) => x.id === c.contractorId)?.name || "-"}</span><Badge type={c.type} /></div><div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>Obra: {projects.find((x) => x.id === c.projectId)?.name || "-"}</div>{c.description && <div style={{ fontSize: 11, color: "#64748b" }}>{c.description}</div>}</div><div style={{ textAlign: "right" }}><div style={{ fontSize: 11, color: "#94a3b8" }}>Valor</div><div style={{ fontSize: 16, fontWeight: 800, color: "#f8fafc" }}>{fmt(c.totalValue)}</div></div></div><div style={{ marginTop: 10, display: "flex", gap: 10 }}><div style={{ padding: "8px 12px", borderRadius: 8, background: "#22c55e15", border: "1px solid #22c55e25" }}><div style={{ fontSize: 9, color: "#86efac", fontWeight: 700 }}>PAGO</div><div style={{ fontSize: 16, fontWeight: 800, color: "#22c55e" }}>{fmt(paid)}</div></div>{c.type === "fechado" && c.totalValue > 0 && <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}><div style={{ height: 5, background: "#334155", borderRadius: 3 }}><div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#2563eb,#22c55e)", borderRadius: 3 }} /></div><div style={{ fontSize: 10, color: "#64748b", marginTop: 3 }}>{pct.toFixed(0)}%</div></div>}</div><div style={{ display: "flex", gap: 6, marginTop: 10 }}><button onClick={() => { setForm({ contractorId: c.contractorId, projectId: c.projectId, type: c.type, totalValue: c.totalValue, description: c.description || "" }); setEdit(c.id); setModal(true); }} style={{ ...bS, padding: "5px 12px", fontSize: 11 }}>Editar</button><button onClick={() => ctApi.remove(c.id)} style={{ ...bS, padding: "5px 12px", fontSize: 11, borderColor: "#ef4444", color: "#ef4444" }}>X</button></div></Card>); })}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title={edit ? "Editar Contrato" : "Novo Contrato"}>
+      <Fld label="Empreiteiro"><select style={iS} value={form.contractorId} onChange={(e) => setForm({ ...form, contractorId: e.target.value })}><option value="">Selecione...</option>{contractors.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></Fld>
+      <Fld label="Obra"><select style={iS} value={form.projectId} onChange={(e) => setForm({ ...form, projectId: e.target.value })}><option value="">Selecione...</option>{projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></Fld>
+      <Fld label="Tipo"><select style={iS} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}><option value="fechado">Fechado</option><option value="aberto">Aberto</option></select></Fld>
+      <Fld label="Valor"><input type="number" style={iS} value={form.totalValue} onChange={(e) => setForm({ ...form, totalValue: e.target.value })} /></Fld>
+      <Fld label="Descricao"><input style={iS} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>{edit ? "Salvar" : "Criar"}</button></div>
+    </Modal></div>);
 }
 
-// ─── Show App ───
-function showApp(user){
-  authScreen.style.display='none';
-  appScreen.style.display='block';
-  const nm=user.user_metadata?.name||user.email?.split('@')[0]||'Usuario';
-  const em=user.email||'';
-  const adm=isAdmin(user);
-  const rc=adm?'admin':'user';
-  document.getElementById('userAvatar').textContent=nm.charAt(0).toUpperCase();
-  document.getElementById('userName').textContent=nm;
-  document.getElementById('userRole').textContent=adm?'Administrador':'Administrativo';
-  document.getElementById('ddName').textContent=nm;
-  document.getElementById('ddEmail').textContent=em;
-  const badge=document.getElementById('ddBadge');
-  badge.textContent=adm?'Admin':'Administrativo';
-  badge.className='role-badge '+(adm?'admin':'user');
-  document.getElementById('ddAdminItems').innerHTML=adm?'<button class="dd-item" id="btnNewUser">Criar novo usuario</button>':'';
-  // Load app
-  appFrame.src='app.html#role='+rc;
-  resizeFrame();
-  // Events
-  if(adm){setTimeout(()=>{const btn=document.getElementById('btnNewUser');if(btn)btn.addEventListener('click',()=>showRegister());},100);}
+function PayPayments({ contractors, projects, contracts, payments, pmApi }) {
+  const [modal, setModal] = useState(false); const [form, setForm] = useState({ contractId: "", amount: 0, date: today() }); const [filterDate, setFilterDate] = useState(today()); const [calOpen, setCalOpen] = useState(false);
+  const save = () => { if (!form.contractId || !form.amount) return; pmApi.insert({ ...form, id: genId(), amount: Number(form.amount) }); setModal(false); };
+  const filtered = payments.filter((p) => p.date === filterDate); const dayTotal = filtered.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const getLabel = (c) => { const con = contractors.find((x) => x.id === c.contractorId); const proj = projects.find((x) => x.id === c.projectId); return `${con?.name || "?"} | ${proj?.name || "?"}${c.description ? ` - ${c.description}` : ""}`; };
+  return (<div>
+    <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "flex-end" }}><div><label style={lS}>Data</label><button onClick={() => setCalOpen(!calOpen)} style={{ ...iS, width: 180, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}><span>{fmtDate(filterDate)}</span><span style={{ fontSize: 10, color: "#64748b" }}>{calOpen ? "^" : "v"}</span></button></div><div style={{ flex: 1 }} /><button onClick={() => { setForm({ contractId: contracts[0]?.id || "", amount: 0, date: filterDate }); setModal(true); }} style={{ ...bP, marginBottom: 16 }}>+ Pagamento</button></div>
+    {calOpen && <div style={{ marginBottom: 16, maxWidth: 360 }}><Cal selectedDate={filterDate} onSelect={(d) => { setFilterDate(d); setCalOpen(false); }} items={payments} dateField="date" /></div>}
+    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>{fmtDate(filterDate)} {filtered.length > 0 && <span>| Total: <strong style={{ color: "#22c55e" }}>{fmt(dayTotal)}</strong></span>}</div>
+    {filtered.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhum pagamento.</p></Card> :
+      <div style={{ display: "grid", gap: 6 }}>{filtered.map((p) => { const ct = contracts.find((c) => c.id === p.contractId); const con = contractors.find((c) => c.id === ct?.contractorId); return (<div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 8, background: "#1e293b" }}><div><span style={{ fontSize: 13, fontWeight: 600, color: "#f8fafc" }}>{con?.name || "-"}</span>{ct?.description && <span style={{ fontSize: 11, color: "#64748b", marginLeft: 8 }}>{ct.description}</span>}</div><div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontWeight: 700, color: "#22c55e" }}>{fmt(p.amount)}</span><button onClick={() => pmApi.remove(p.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }}>X</button></div></div>); })}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title="Registrar Pagamento">
+      <Fld label="Contrato"><select style={iS} value={form.contractId} onChange={(e) => setForm({ ...form, contractId: e.target.value })}><option value="">Selecione...</option>{contracts.map((c) => <option key={c.id} value={c.id}>{getLabel(c)}</option>)}</select></Fld>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}><Fld label="Valor (R$)"><input type="number" style={iS} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></Fld><Fld label="Data"><input type="date" style={iS} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Fld></div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>Confirmar</button></div>
+    </Modal></div>);
 }
 
-// ─── Menu Toggle ───
-document.getElementById('menuBtn').addEventListener('click',e=>{
-  e.stopPropagation();
-  document.getElementById('menuDropdown').classList.toggle('open');
-});
-document.addEventListener('click',()=>{document.getElementById('menuDropdown').classList.remove('open');});
-
-// ─── Logout ───
-document.getElementById('btnLogout').addEventListener('click',async()=>{
-  await supabase.auth.signOut();showLogin();
-});
-
-// ─── Change Password ───
-document.getElementById('btnChangePw').addEventListener('click',async()=>{
-  const p=prompt('Nova senha (minimo 6 caracteres):');
-  if(!p||p.length<6){alert('Senha minimo 6 caracteres.');return;}
-  try{const{error}=await supabase.auth.updateUser({password:p});if(error)throw error;alert('Senha alterada!');}
-  catch(e){alert('Erro: '+translateError(e.message));}
-});
-
-window.addEventListener('resize',resizeFrame);
-
-function translateError(m){
-  const t={'Invalid login credentials':'E-mail ou senha incorretos.','Email not confirmed':'E-mail nao confirmado.','User already registered':'E-mail ja cadastrado.','Password should be at least 6 characters':'Senha minimo 6 caracteres.','Unable to validate email address: invalid format':'E-mail invalido.','Email rate limit exceeded':'Muitas tentativas. Aguarde.'};
-  for(const[k,v] of Object.entries(t))if(m.includes(k))return v;return m;
+function PayProjects({ projects, pApi }) {
+  const [modal, setModal] = useState(false); const [edit, setEdit] = useState(null); const [form, setForm] = useState({ name: "", address: "", status: "ativo" });
+  const save = () => { if (!form.name) return; if (edit) pApi.update(edit, form); else pApi.insert({ ...form, id: genId() }); setModal(false); };
+  return (<div>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}><button onClick={() => { setForm({ name: "", address: "", status: "ativo" }); setEdit(null); setModal(true); }} style={bP}>+ Nova Obra</button></div>
+    {projects.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhuma obra.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{projects.map((p) => (<Card key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, padding: "14px 18px" }}><div><div style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={{ fontWeight: 700, color: "#f8fafc" }}>{p.name}</span><Badge type={p.status} /></div>{p.address && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{p.address}</div>}</div><div style={{ display: "flex", gap: 6 }}><button onClick={() => { setForm({ name: p.name, address: p.address || "", status: p.status }); setEdit(p.id); setModal(true); }} style={{ ...bS, padding: "5px 12px", fontSize: 11 }}>Editar</button><button onClick={() => pApi.remove(p.id)} style={{ ...bS, padding: "5px 12px", fontSize: 11, borderColor: "#ef4444", color: "#ef4444" }}>X</button></div></Card>))}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title={edit ? "Editar Obra" : "Nova Obra"}>
+      <Fld label="Nome"><input style={iS} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Fld>
+      <Fld label="Endereco"><input style={iS} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></Fld>
+      <Fld label="Status"><select style={iS} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="ativo">Ativo</option><option value="concluido">Concluido</option><option value="cancelado">Cancelado</option></select></Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>{edit ? "Salvar" : "Criar"}</button></div>
+    </Modal></div>);
 }
 
-// ─── Init ───
-async function init(){
-  authScreen.innerHTML=`<div class="auth-container"><div style="text-align:center"><div class="auth-logo">${logo(80)}</div><div class="spinner"></div><p style="color:#94a3b8;font-size:14px">Carregando...</p></div></div>`;
-  try{
-    const{data:{session}}=await supabase.auth.getSession();
-    if(session?.user){showApp(session.user);}
-    else{showLogin();}
-  }catch(e){showLogin();}
+const PAY_TABS = [{ id: "dash", label: "Painel", icon: "📊" }, { id: "empr", label: "Empreiteiros", icon: "👷" }, { id: "obras", label: "Obras", icon: "🏗️" }, { id: "contr", label: "Contratos", icon: "📋" }, { id: "pgto", label: "Pagamentos", icon: "💰" }];
+
+function PayModule({ onBack }) {
+  const [tab, setTab] = useState("dash");
+  const cApi = useDB('contractors',payF.contractors); const pApi = useDB('projects',payF.projects); const ctApi = useDB('contracts',payF.contracts); const pmApi = useDB('payments',payF.payments);
+  const loaded = cApi.loaded&&pApi.loaded&&ctApi.loaded&&pmApi.loaded;
+  useEffect(()=>{const i=setInterval(()=>{cApi.reload();pApi.reload();ctApi.reload();pmApi.reload();},30000);return()=>clearInterval(i);},[]);
+  const props = { contractors: cApi.data, projects: pApi.data, contracts: ctApi.data, payments: pmApi.data, cApi, pApi, ctApi, pmApi };
+  if(!loaded) return(<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628"}}><div style={{textAlign:"center"}}><Logo size={60}/><div style={{width:28,height:28,border:"3px solid #334155",borderTopColor:"#2563eb",borderRadius:"50%",animation:"spin .7s linear infinite",margin:"14px auto"}}/><div style={{fontSize:12,color:"#64748b"}}>Carregando Pay...</div></div></div>);
+  return (<div style={{ paddingBottom: 80 }}>
+    <header style={{ padding: "10px 14px", background: "#0a1628", borderBottom: "1px solid #1e3a5f", display: "flex", alignItems: "center", gap: 8 }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: "#3b82f6", fontSize: 18, cursor: "pointer", padding: "2px 6px" }}>{"<"}</button>
+      <div style={{ fontWeight: 800, fontSize: 14, color: "#f8fafc" }}>Guerreira Pay</div>
+    </header>
+    <main style={{ padding: "16px 14px" }}>
+      {tab === "dash" && <PayDashboard {...props} />}
+      {tab === "empr" && <PayContractors {...props} />}
+      {tab === "obras" && <PayProjects {...props} />}
+      {tab === "contr" && <PayContracts {...props} />}
+      {tab === "pgto" && <PayPayments {...props} />}
+    </main>
+    <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, background: "#0a1628", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "6px 0 8px" }}>
+      {PAY_TABS.map((t) => { const a = tab === t.id; return (<button key={t.id} onClick={() => setTab(t.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", position: "relative" }}>{a && <div style={{ position: "absolute", top: -1, left: "50%", transform: "translateX(-50%)", width: 22, height: 3, borderRadius: "0 0 3px 3px", background: "#2563eb" }} />}<span style={{ fontSize: 17, filter: a ? "none" : "grayscale(1) opacity(0.4)" }}>{t.icon}</span><span style={{ fontSize: 7, fontWeight: a ? 800 : 500, color: a ? "#3b82f6" : "#64748b" }}>{t.label}</span></button>); })}
+    </nav>
+  </div>);
 }
-init();
+
+// ═══════════════════════════════════════════
+// TRANSPORTE MODULE
+// ═══════════════════════════════════════════
+function TObras({ obras, oApi }) {
+  const [modal, setModal] = useState(false); const [edit, setEdit] = useState(null); const [form, setForm] = useState({ cliente: "", endereco: "", ativa: true });
+  const save = () => { if (!form.cliente) return; if (edit) oApi.update(edit, form); else oApi.insert({ ...form, id: genId() }); setModal(false); };
+  return (<div>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}><button onClick={() => { setForm({ cliente: "", endereco: "", ativa: true }); setEdit(null); setModal(true); }} style={bP}>+ Nova Obra</button></div>
+    {obras.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhuma obra.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{obras.map((o) => (<Card key={o.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, padding: "14px 18px" }}><div><div style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={{ fontWeight: 700, color: "#f8fafc" }}>{o.cliente}</span><span style={{ padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 700, background: o.ativa ? "#22c55e22" : "#ef444422", color: o.ativa ? "#22c55e" : "#ef4444" }}>{o.ativa ? "Ativa" : "Inativa"}</span></div>{o.endereco && <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{o.endereco}</div>}</div><div style={{ display: "flex", gap: 6 }}><button onClick={() => { setForm({ cliente: o.cliente, endereco: o.endereco || "", ativa: o.ativa }); setEdit(o.id); setModal(true); }} style={{ ...bS, padding: "5px 12px", fontSize: 11 }}>Editar</button><button onClick={() => oApi.remove(o.id)} style={{ ...bS, padding: "5px 12px", fontSize: 11, borderColor: "#ef4444", color: "#ef4444" }}>X</button></div></Card>))}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title={edit ? "Editar Obra" : "Nova Obra"}>
+      <Fld label="Cliente"><input style={iS} value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} /></Fld>
+      <Fld label="Endereco"><input style={iS} value={form.endereco} onChange={(e) => setForm({ ...form, endereco: e.target.value })} /></Fld>
+      <Fld label="Status"><select style={iS} value={form.ativa ? "1" : "0"} onChange={(e) => setForm({ ...form, ativa: e.target.value === "1" })}><option value="1">Ativa</option><option value="0">Inativa</option></select></Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>{edit ? "Salvar" : "Criar"}</button></div>
+    </Modal></div>);
+}
+
+function TFunc({ obras, funcionarios, fApi, trechos, tApi }) {
+  const [modal, setModal] = useState(false); const [edit, setEdit] = useState(null); const [form, setForm] = useState({ nome: "", cpf: "", cidade: "", obraId: "", tipo: "clt", cargo: "" });
+  const [tModal, setTModal] = useState(false); const [tFuncId, setTFuncId] = useState(null); const [tForm, setTForm] = useState({ descricao: "", valorIda: 0, valorVolta: 0 }); const [tEdit, setTEdit] = useState(null);
+  const save = () => { if (!form.nome) return; if (edit) fApi.update(edit, form); else fApi.insert({ ...form, id: genId() }); setModal(false); };
+  const saveTrecho = () => { if (!tForm.descricao) return; const d = { ...tForm, valorIda: Number(tForm.valorIda), valorVolta: Number(tForm.valorVolta), funcionarioId: tFuncId }; if (tEdit) tApi.update(tEdit, d); else tApi.insert({ ...d, id: genId() }); setTForm({ descricao: "", valorIda: 0, valorVolta: 0 }); setTEdit(null); };
+  const totalFunc = (id) => trechos.filter((t) => t.funcionarioId === id).reduce((s, t) => s + (Number(t.valorIda) || 0) + (Number(t.valorVolta) || 0), 0);
+  const funcTrechos = trechos.filter((t) => t.funcionarioId === tFuncId);
+  return (<div>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}><button onClick={() => { setForm({ nome: "", cpf: "", cidade: "", obraId: obras[0]?.id || "", tipo: "clt", cargo: "" }); setEdit(null); setModal(true); }} style={bP}>+ Novo</button></div>
+    {funcionarios.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhum funcionario.</p></Card> :
+      <div style={{ display: "grid", gap: 10 }}>{funcionarios.map((f) => { const ob = obras.find((o) => o.id === f.obraId); const vt = totalFunc(f.id); return (<Card key={f.id} style={{ padding: "14px 18px" }}><div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}><div><div style={{ display: "flex", gap: 6, alignItems: "center" }}><span style={{ fontWeight: 700, color: "#f8fafc" }}>{f.nome}</span>{f.cargo && <span style={{ fontSize: 11, color: "#94a3b8" }}>- {f.cargo}</span>}<span style={{ padding: "2px 8px", borderRadius: 10, fontSize: 9, fontWeight: 700, background: f.tipo === "diarista" ? "#f59e0b22" : "#8b5cf622", color: f.tipo === "diarista" ? "#f59e0b" : "#8b5cf6" }}>{f.tipo === "diarista" ? "Diarista" : "CLT"}</span></div><div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>CPF: {f.cpf || "-"} | {f.cidade || "-"} | {ob?.cliente || "-"}</div></div><div style={{ padding: "4px 10px", borderRadius: 8, background: "#22c55e15", border: "1px solid #22c55e25" }}><div style={{ fontSize: 8, color: "#86efac", fontWeight: 700 }}>DIA</div><div style={{ fontSize: 14, fontWeight: 800, color: "#22c55e" }}>{fmt(vt)}</div></div></div><div style={{ display: "flex", gap: 6, marginTop: 8 }}><button onClick={() => { setTFuncId(f.id); setTForm({ descricao: "", valorIda: 0, valorVolta: 0 }); setTEdit(null); setTModal(true); }} style={{ ...bP, padding: "5px 12px", fontSize: 11 }}>Trechos</button><button onClick={() => { setForm({ nome: f.nome, cpf: f.cpf || "", cidade: f.cidade || "", obraId: f.obraId || "", tipo: f.tipo || "clt", cargo: f.cargo || "" }); setEdit(f.id); setModal(true); }} style={{ ...bS, padding: "5px 12px", fontSize: 11 }}>Editar</button><button onClick={() => fApi.remove(f.id)} style={{ ...bS, padding: "5px 12px", fontSize: 11, borderColor: "#ef4444", color: "#ef4444" }}>X</button></div></Card>); })}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title={edit ? "Editar" : "Novo Funcionario"}>
+      <Fld label="Nome"><input style={iS} value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} /></Fld>
+      <Fld label="CPF"><input style={iS} value={form.cpf} maxLength={14} onChange={(e) => setForm({ ...form, cpf: cpfMask(e.target.value) })} /></Fld>
+      <Fld label="Cidade"><input style={iS} value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} /></Fld>
+      <Fld label="Cargo"><input style={iS} value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} placeholder="Ex: Pedreiro, Eletricista..." /></Fld>
+      <Fld label="Tipo"><select style={iS} value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}><option value="clt">CLT</option><option value="diarista">Diarista</option></select></Fld>
+      <Fld label="Obra"><select style={iS} value={form.obraId} onChange={(e) => setForm({ ...form, obraId: e.target.value })}><option value="">Selecione...</option>{obras.filter((o) => o.ativa).map((o) => <option key={o.id} value={o.id}>{o.cliente}</option>)}</select></Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={save} style={bP}>{edit ? "Salvar" : "Cadastrar"}</button></div>
+    </Modal>
+    <Modal open={tModal} onClose={() => setTModal(false)} title={"Trechos - " + (funcionarios.find((f) => f.id === tFuncId)?.nome || "")}>
+      {funcTrechos.length > 0 && <div style={{ display: "grid", gap: 6, marginBottom: 14 }}>{funcTrechos.map((t) => (<div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", borderRadius: 8, background: "#0f172a" }}><div><div style={{ fontSize: 12, fontWeight: 600, color: "#f8fafc" }}>{t.descricao}</div><div style={{ fontSize: 10, color: "#94a3b8" }}>Ida: {fmt(t.valorIda)} | Volta: {fmt(t.valorVolta)}</div></div><div style={{ display: "flex", gap: 6 }}><button onClick={() => { setTForm({ descricao: t.descricao, valorIda: t.valorIda, valorVolta: t.valorVolta }); setTEdit(t.id); }} style={{ background: "none", border: "none", color: "#3b82f6", cursor: "pointer", fontSize: 11 }}>Editar</button><button onClick={() => tApi.remove(t.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 11 }}>X</button></div></div>))}</div>}
+      <div style={{ borderTop: "1px solid #334155", paddingTop: 14 }}>
+        <Fld label="Trecho"><input style={iS} value={tForm.descricao} onChange={(e) => setTForm({ ...tForm, descricao: e.target.value })} placeholder="Ex: Linha 123" /></Fld>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}><Fld label="Ida (R$)"><input type="number" style={iS} value={tForm.valorIda} onChange={(e) => setTForm({ ...tForm, valorIda: e.target.value })} /></Fld><Fld label="Volta (R$)"><input type="number" style={iS} value={tForm.valorVolta} onChange={(e) => setTForm({ ...tForm, valorVolta: e.target.value })} /></Fld></div>
+        <button onClick={saveTrecho} style={bP}>{tEdit ? "Salvar" : "+ Adicionar"}</button>
+      </div>
+    </Modal></div>);
+}
+
+function TLanc({ obras, funcionarios, trechos, lancamentos, lApi }) {
+  const [date, setDate] = useState(today()); const [calOpen, setCalOpen] = useState(false); const [modal, setModal] = useState(false); const [selObra, setSelObra] = useState(""); const [avulso, setAvulso] = useState({ descricao: "", valor: 0, funcionarioId: "", fotoPreview: "" });
+  const handleFoto = (e) => { const file = e.target.files?.[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => setAvulso((prev) => ({ ...prev, fotoPreview: ev.target.result })); reader.readAsDataURL(file); } };
+  const dayLanc = lancamentos.filter((l) => l.data === date); const dayTotal = dayLanc.reduce((s, l) => s + (Number(l.valor) || 0), 0);
+  const lancar = () => { if (!selObra) return; funcionarios.filter((f) => f.obraId === selObra).forEach((f) => { const val = trechos.filter((t) => t.funcionarioId === f.id).reduce((s, t) => s + (Number(t.valorIda) || 0) + (Number(t.valorVolta) || 0), 0); if (val > 0 && !dayLanc.find((l) => l.funcionarioId === f.id && l.tipo === "passagem")) lApi.insert({ id: genId(), obraId: selObra, funcionarioId: f.id, data: date, valor: val, tipo: "passagem", descricao: "" }); }); };
+  const lancarAvulso = () => { if (!avulso.descricao || !avulso.valor || !avulso.funcionarioId) return; const f = funcionarios.find((x) => x.id === avulso.funcionarioId); lApi.insert({ id: genId(), obraId: f?.obraId || "", funcionarioId: avulso.funcionarioId, data: date, valor: Number(avulso.valor), tipo: "avulso", descricao: avulso.descricao, comprovanteUrl: avulso.fotoPreview || "" }); setAvulso({ descricao: "", valor: 0, funcionarioId: "", fotoPreview: "" }); setModal(false); };
+  const grouped = {}; dayLanc.forEach((l) => { const k = l.obraId || "sem"; if (!grouped[k]) grouped[k] = { obra: obras.find((o) => o.id === l.obraId), items: [], total: 0 }; const func = funcionarios.find((x) => x.id === l.funcionarioId); grouped[k].items.push({ ...l, funcNome: func?.nome || "-", funcCargo: func?.cargo || "", funcCidade: func?.cidade || "" }); grouped[k].total += Number(l.valor) || 0; });
+  const whatsapp = () => { let m = `*GUERREIRA TRANSPORTE*\n*${fmtDate(date)}*\n--------------------------------\n\n`; Object.values(grouped).forEach((g) => { m += `*${g.obra?.cliente || "-"}*\n`; g.items.forEach((i, idx) => { const cargo = i.funcCargo ? ` - ${i.funcCargo}` : ""; const cidade = i.funcCidade ? ` (${i.funcCidade})` : ""; m += `${idx + 1}. ${i.funcNome}${cargo}: *${fmt(i.valor)}*${cidade}${i.tipo === "avulso" ? ` [${i.descricao}]` : ""}\n`; }); m += `Subtotal: *${fmt(g.total)}*\n\n`; }); m += `--------------------------------\n*TOTAL: ${fmt(dayTotal)}*`; window.open(`https://wa.me/?text=${encodeURIComponent(m)}`, "_blank"); };
+  return (<div>
+    <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "flex-end" }}><div><label style={lS}>Data</label><button onClick={() => setCalOpen(!calOpen)} style={{ ...iS, width: 180, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}><span>{fmtDate(date)}</span><span style={{ fontSize: 10, color: "#64748b" }}>{calOpen ? "^" : "v"}</span></button></div></div>
+    {calOpen && <div style={{ marginBottom: 16, maxWidth: 360 }}><Cal selectedDate={date} onSelect={(d) => { setDate(d); setCalOpen(false); }} items={lancamentos} dateField="data" /></div>}
+    <Card style={{ marginBottom: 14 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#f8fafc", marginBottom: 10 }}>Lancar passagens</div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <Fld label="Obra"><select style={{ ...iS, width: 180 }} value={selObra} onChange={(e) => setSelObra(e.target.value)}><option value="">Selecione...</option>{obras.filter((o) => o.ativa).map((o) => <option key={o.id} value={o.id}>{o.cliente}</option>)}</select></Fld>
+        <button onClick={lancar} style={{ ...bP, marginBottom: 16 }} disabled={!selObra}>Lancar</button>
+        <button onClick={() => setModal(true)} style={{ ...bS, marginBottom: 16 }}>+ Avulso</button>
+        <button onClick={whatsapp} style={{ ...bP, background: "linear-gradient(135deg,#25D366,#128C7E)", marginBottom: 16 }} disabled={!dayLanc.length}>WhatsApp</button>
+      </div>
+    </Card>
+    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>{fmtDate(date)} {dayLanc.length > 0 && <span>| Total: <strong style={{ color: "#22c55e" }}>{fmt(dayTotal)}</strong></span>}</div>
+    {dayLanc.length === 0 ? <Card><p style={{ color: "#64748b", fontSize: 13, textAlign: "center" }}>Nenhum lancamento.</p></Card> :
+      <div style={{ display: "grid", gap: 12 }}>{Object.values(grouped).map((g, i) => (<Card key={i} style={{ padding: "14px 18px" }}><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}><span style={{ fontWeight: 700, color: "#f8fafc" }}>{g.obra?.cliente || "-"}</span><span style={{ fontWeight: 700, color: "#3b82f6", fontSize: 13 }}>{fmt(g.total)}</span></div><div style={{ display: "grid", gap: 4 }}>{g.items.map((l, idx) => (<div key={l.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 12px", borderRadius: 6, background: "#0f172a" }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 11, fontWeight: 700, color: "#3b82f6", minWidth: 20 }}>{idx + 1}.</span><div><span style={{ fontSize: 12, fontWeight: 600, color: "#f8fafc" }}>{l.funcNome}</span>{l.funcCargo && <span style={{ fontSize: 10, color: "#94a3b8" }}> - {l.funcCargo}</span>}{l.tipo === "avulso" && <span style={{ fontSize: 10, color: "#64748b", marginLeft: 6 }}>{l.descricao}</span>}</div></div><div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontWeight: 700, color: "#22c55e", fontSize: 13 }}>{fmt(l.valor)}</span>{l.funcCidade && <span style={{ fontSize: 10, color: "#64748b" }}>{l.funcCidade}</span>}<button onClick={() => lApi.remove(l.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 11 }}>X</button></div></div>))}</div></Card>))}</div>}
+    <Modal open={modal} onClose={() => setModal(false)} title="Avulso">
+      <Fld label="Funcionario"><select style={iS} value={avulso.funcionarioId} onChange={(e) => setAvulso({ ...avulso, funcionarioId: e.target.value })}><option value="">Selecione...</option>{funcionarios.map((f) => <option key={f.id} value={f.id}>{f.nome}</option>)}</select></Fld>
+      <Fld label="Descricao"><input style={iS} value={avulso.descricao} onChange={(e) => setAvulso({ ...avulso, descricao: e.target.value })} placeholder="Uber, combustivel..." /></Fld>
+      <Fld label="Valor"><input type="number" style={iS} value={avulso.valor} onChange={(e) => setAvulso({ ...avulso, valor: e.target.value })} /></Fld>
+      <Fld label="Comprovante (foto)">
+        <input type="file" accept="image/*" capture="environment" onChange={handleFoto} style={{ ...iS, padding: "8px 12px", fontSize: 13 }} />
+        {avulso.fotoPreview && <div style={{ marginTop: 8 }}><img src={avulso.fotoPreview} style={{ width: "100%", maxHeight: 200, objectFit: "contain", borderRadius: 8, border: "1px solid #334155" }} /><button onClick={() => setAvulso({ ...avulso, fotoPreview: "" })} style={{ background: "none", border: "none", color: "#ef4444", fontSize: 11, cursor: "pointer", marginTop: 4 }}>Remover foto</button></div>}
+      </Fld>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button onClick={() => setModal(false)} style={bS}>Cancelar</button><button onClick={lancarAvulso} style={bP}>Lancar</button></div>
+    </Modal></div>);
+}
+
+function TFin({ obras, funcionarios, lancamentos }) {
+  const totalGeral = lancamentos.reduce((s, l) => s + (Number(l.valor) || 0), 0);
+  return (<div><div style={{ display: "grid", gap: 12 }}>{obras.map((o) => { const ol = lancamentos.filter((l) => l.obraId === o.id); const tot = ol.reduce((s, l) => s + (Number(l.valor) || 0), 0); const tp = ol.filter((l) => l.tipo === "passagem").reduce((s, l) => s + (Number(l.valor) || 0), 0); const ta = ol.filter((l) => l.tipo === "avulso").reduce((s, l) => s + (Number(l.valor) || 0), 0); const bf = {}; ol.forEach((l) => { if (!bf[l.funcionarioId]) bf[l.funcionarioId] = { p: 0, a: 0 }; if (l.tipo === "avulso") bf[l.funcionarioId].a += Number(l.valor) || 0; else bf[l.funcionarioId].p += Number(l.valor) || 0; }); return (<Card key={o.id} style={{ padding: 0, overflow: "hidden" }}><div style={{ padding: "12px 18px", background: "#0f172a", display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontWeight: 700, color: "#f8fafc" }}>{o.cliente}</div></div><div style={{ padding: "4px 10px", borderRadius: 8, background: "#3b82f618", border: "1px solid #3b82f633" }}><div style={{ fontSize: 8, color: "#93c5fd", fontWeight: 700 }}>TOTAL</div><div style={{ fontSize: 15, fontWeight: 800, color: "#3b82f6" }}>{fmt(tot)}</div></div></div><div style={{ padding: "10px 18px" }}><div style={{ display: "flex", gap: 8, marginBottom: 10 }}><div style={{ flex: 1, padding: "6px 10px", borderRadius: 6, background: "#22c55e10", border: "1px solid #22c55e20" }}><div style={{ fontSize: 8, color: "#86efac", fontWeight: 700 }}>PASSAGENS</div><div style={{ fontSize: 13, fontWeight: 800, color: "#22c55e" }}>{fmt(tp)}</div></div><div style={{ flex: 1, padding: "6px 10px", borderRadius: 6, background: "#f59e0b10", border: "1px solid #f59e0b20" }}><div style={{ fontSize: 8, color: "#fcd34d", fontWeight: 700 }}>AVULSOS</div><div style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{fmt(ta)}</div></div></div>{Object.entries(bf).map(([fid, fd]) => { const f = funcionarios.find((x) => x.id === fid); return (<div key={fid} style={{ display: "flex", justifyContent: "space-between", padding: "5px 10px", borderRadius: 4, background: "#0f172a", marginBottom: 3 }}><span style={{ fontSize: 11, color: "#cbd5e1" }}>{f?.nome || "-"}</span><span style={{ fontSize: 11, fontWeight: 700, color: "#22c55e" }}>{fmt(fd.p + fd.a)}</span></div>); })}</div></Card>); })}
+    <Card style={{ background: "linear-gradient(135deg,#3b82f610,#1d4ed808)", border: "1px solid #3b82f633", padding: "12px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ fontWeight: 700, color: "#3b82f6" }}>CUSTO TOTAL</span><span style={{ fontSize: 18, fontWeight: 800, color: "#3b82f6" }}>{fmt(totalGeral)}</span></Card></div></div>);
+}
+
+const TRANS_TABS = [{ id: "obras", label: "Obras", icon: "🏗️" }, { id: "func", label: "Funcionarios", icon: "👷" }, { id: "lanc", label: "Lancamentos", icon: "💰" }, { id: "fin", label: "Financeiro", icon: "📊" }];
+
+function TransporteModule({ onBack }) {
+  const [tab, setTab] = useState("obras");
+  const oApi = useDB('obras',transF.obras); const fApi = useDB('funcionarios',transF.func); const tApi = useDB('trechos',transF.trechos); const lApi = useDB('lancamentos',transF.lanc);
+  const loaded = oApi.loaded&&fApi.loaded&&tApi.loaded&&lApi.loaded;
+  useEffect(()=>{const i=setInterval(()=>{oApi.reload();fApi.reload();tApi.reload();lApi.reload();},30000);return()=>clearInterval(i);},[]);
+  const props = { obras: oApi.data, funcionarios: fApi.data, trechos: tApi.data, lancamentos: lApi.data, oApi, fApi, tApi, lApi };
+  if(!loaded) return(<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628"}}><div style={{textAlign:"center"}}><Logo size={60}/><div style={{width:28,height:28,border:"3px solid #334155",borderTopColor:"#22c55e",borderRadius:"50%",animation:"spin .7s linear infinite",margin:"14px auto"}}/><div style={{fontSize:12,color:"#64748b"}}>Carregando Transporte...</div></div></div>);
+  return (<div style={{ paddingBottom: 80 }}>
+    <header style={{ padding: "10px 14px", background: "#0a1628", borderBottom: "1px solid #1e3a5f", display: "flex", alignItems: "center", gap: 8 }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: "#3b82f6", fontSize: 18, cursor: "pointer", padding: "2px 6px" }}>{"<"}</button>
+      <div style={{ fontWeight: 800, fontSize: 14, color: "#f8fafc" }}>Guerreira Transporte</div>
+    </header>
+    <main style={{ padding: "16px 14px" }}>
+      {tab === "obras" && <TObras {...props} />}
+      {tab === "func" && <TFunc {...props} />}
+      {tab === "lanc" && <TLanc {...props} />}
+      {tab === "fin" && <TFin {...props} />}
+    </main>
+    <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, background: "#0a1628", borderTop: "1px solid #1e3a5f", display: "flex", justifyContent: "space-around", padding: "6px 0 8px" }}>
+      {TRANS_TABS.map((t) => { const a = tab === t.id; return (<button key={t.id} onClick={() => setTab(t.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, background: "none", border: "none", cursor: "pointer", padding: "4px 6px", position: "relative" }}>{a && <div style={{ position: "absolute", top: -1, left: "50%", transform: "translateX(-50%)", width: 22, height: 3, borderRadius: "0 0 3px 3px", background: "#2563eb" }} />}<span style={{ fontSize: 17, filter: a ? "none" : "grayscale(1) opacity(0.4)" }}>{t.icon}</span><span style={{ fontSize: 7, fontWeight: a ? 800 : 500, color: a ? "#3b82f6" : "#64748b" }}>{t.label}</span></button>); })}
+    </nav>
+  </div>);
+}
+
+// ═══════════════════════════════════════════
+
+// LOGIN
+const authI={width:"100%",padding:"12px 16px",background:"#0f172a",border:"1px solid #334155",borderRadius:10,color:"#e2e8f0",fontSize:16,fontFamily:"'DM Sans',sans-serif",outline:"none",marginBottom:14};
+const authB={width:"100%",padding:"14px",background:"linear-gradient(135deg,#2563eb,#1d4ed8)",border:"none",borderRadius:10,color:"#fff",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",marginTop:6};
+function LoginScreen({onLogin}){
+  const[email,setEmail]=useState('');const[pass,setPass]=useState('');const[err,setErr]=useState('');const[loading,setLoading]=useState(false);
+  const tErr=m=>{const t={'Invalid login credentials':'E-mail ou senha incorretos.','User already registered':'E-mail ja cadastrado.','Password should be at least 6 characters':'Senha minimo 6 caracteres.'};for(const[k,v] of Object.entries(t))if(m.includes(k))return v;return m;};
+  const doLogin=async e=>{e.preventDefault();if(!email||!pass){setErr('Preencha todos os campos.');return;}setLoading(true);setErr('');try{const{data,error}=await sb.auth.signInWithPassword({email,password:pass});if(error)throw error;onLogin(data.user);}catch(x){setErr(tErr(x.message));}setLoading(false);};
+  return(<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#0a1628,#0f1d32)",padding:20}}>
+    <div style={{background:"#1e293b",borderRadius:20,padding:"40px 32px",width:400,maxWidth:"100%"}}>
+      <div style={{textAlign:"center",marginBottom:28}}><GCLogo size={80}/></div>
+      <div style={{fontSize:22,fontWeight:800,color:"#f8fafc",textAlign:"center",marginBottom:4}}>Guerreira Construtora</div>
+      <div style={{fontSize:11,color:"#64748b",textAlign:"center",marginBottom:28,textTransform:"uppercase",letterSpacing:1.5,fontWeight:600}}>Sistema de Gestao</div>
+      {err&&<div style={{background:"#ef444422",border:"1px solid #ef444444",borderRadius:8,padding:"10px 14px",color:"#fca5a5",fontSize:13,marginBottom:14,textAlign:"center"}}>{err}</div>}
+      <form onSubmit={doLogin}><label style={lS}>E-mail</label><input style={authI} type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com" required/><label style={lS}>Senha</label><input style={authI} type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Sua senha" required/><button style={{...authB,opacity:loading?.5:1}} type="submit" disabled={loading}>{loading?'Entrando...':'Entrar'}</button></form>
+    </div>
+  </div>);
+}
+
+// LOGO
+function GCLogo({size=60}){return(<svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(50 30)"><polygon points="0,-18 16,-8 0,2 -16,-8" fill="#8fa4b8"/><polygon points="-16,-8 0,2 0,12 -16,2" fill="#2b5797"/><polygon points="16,-8 0,2 0,12 16,2" fill="#3a6db5"/></g><g transform="translate(50 50)"><polygon points="-40,0 -24,-10 -8,0 -24,10" fill="#1a4178"/><polygon points="-22,0 -6,-10 10,0 -6,10" fill="#2b5797"/><polygon points="-10,0 6,-10 22,0 6,10" fill="#1a4178"/><polygon points="8,0 24,-10 40,0 24,10" fill="#2b5797"/><polygon points="-30,8 -14,-2 2,8 -14,18" fill="#3a6db5"/><polygon points="-2,8 14,-2 30,8 14,18" fill="#3a6db5"/></g><text x="50" y="82" textAnchor="middle" fill="#2b5797" fontSize="10" fontWeight="900" fontFamily="Arial">GUERREIRA</text><text x="50" y="94" textAnchor="middle" fill="#8fa4b8" fontSize="6" fontWeight="600" fontFamily="Arial">CONSTRUTORA</text></svg>);}
+
+// MENU
+function MainMenu({onSelect,user}){
+  const nm=user?.user_metadata?.name||user?.email?.split('@')[0]||'Usuario';
+  return(<div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0a1628,#0f1d32)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24}}>
+    <GCLogo size={80}/>
+    <h1 style={{fontSize:22,fontWeight:800,color:"#f8fafc",marginTop:16,marginBottom:4}}>Guerreira Construtora</h1>
+    <p style={{fontSize:11,color:"#64748b",marginBottom:8,textTransform:"uppercase",letterSpacing:1.5,fontWeight:600}}>Selecione o modulo</p>
+    <p style={{fontSize:11,color:"#94a3b8",marginBottom:28}}>{nm}</p>
+    <div style={{display:"grid",gap:16,width:"100%",maxWidth:400}}>
+      <button onClick={()=>onSelect("pay")} style={{background:"#1e293b",border:"1px solid #1e3a5f",borderRadius:16,padding:"28px 24px",cursor:"pointer",textAlign:"left"}}><div style={{display:"flex",alignItems:"center",gap:14}}><div style={{width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#2563eb22,#1d4ed822)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26}}>💰</div><div><div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>Guerreira Pay</div><div style={{fontSize:12,color:"#94a3b8",marginTop:2}}>Pagamentos de empreiteiros</div></div></div></button>
+      <button onClick={()=>onSelect("transporte")} style={{background:"#1e293b",border:"1px solid #1e3a5f",borderRadius:16,padding:"28px 24px",cursor:"pointer",textAlign:"left"}}><div style={{display:"flex",alignItems:"center",gap:14}}><div style={{width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#22c55e22,#16a34a22)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26}}>🚌</div><div><div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>Guerreira Transporte</div><div style={{fontSize:12,color:"#94a3b8",marginTop:2}}>Controle de passagens</div></div></div></button>
+    </div>
+    <button onClick={async()=>{await sb.auth.signOut();location.reload();}} style={{marginTop:24,background:"none",border:"1px solid #334155",borderRadius:8,padding:"8px 20px",color:"#f87171",fontSize:12,cursor:"pointer",fontWeight:600,fontFamily:"'DM Sans'"}}>Sair</button>
+  </div>);
+}
+
+// ROOT
+function Root(){
+  const[user,setUser]=useState(null);const[checking,setChecking]=useState(true);const[module,setModule]=useState(null);
+  useEffect(()=>{sb.auth.getSession().then(({data:{session}})=>{if(session?.user)setUser(session.user);setChecking(false);});
+    const{data:{subscription}}=sb.auth.onAuthStateChange((ev,s)=>{if(ev==='SIGNED_IN'&&s?.user)setUser(s.user);else if(ev==='SIGNED_OUT'){setUser(null);setModule(null);}});
+    return()=>subscription.unsubscribe();
+  },[]);
+  if(checking)return(<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0a1628"}}><div style={{textAlign:"center"}}><GCLogo size={80}/><div style={{width:32,height:32,border:"3px solid #334155",borderTopColor:"#2563eb",borderRadius:"50%",animation:"spin .7s linear infinite",margin:"16px auto"}}/></div></div>);
+  if(!user)return<LoginScreen onLogin={setUser}/>;
+  if(!module)return<MainMenu onSelect={setModule} user={user}/>;
+  if(module==="pay")return<PayModule onBack={()=>setModule(null)}/>;
+  if(module==="transporte")return<TransporteModule onBack={()=>setModule(null)}/>;
+  return null;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Root/>);
 </script>
 </body>
 </html>
